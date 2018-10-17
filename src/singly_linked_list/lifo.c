@@ -1,3 +1,4 @@
+#include "lifo.h"
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -6,7 +7,7 @@ typedef struct node {
 	void *data;
 } Node;
 
-typedef struct {
+typedef struct lifo {
 	Node *head; /* point to a preallocated block without data */
 	Node *tail;
 	Node *front;
@@ -18,10 +19,10 @@ typedef struct {
 so a->front it's a valid blk */
 
 // TODO test
-inline void * lifo_front(Lifo *ls)   { return ls->front->data; }
-inline void * lifo_back(Lifo *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
-inline int    lifo_length(Lifo *ls)  { return ls->length;      }
-inline bool   lifo_isEmpty(Lifo *ls) { return ls->length == 0; }
+void * lifo_front(Lifo *ls)   { return ls->front->data; }
+void * lifo_back(Lifo *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
+int    lifo_length(Lifo *ls)  { return ls->length;      }
+bool   lifo_isEmpty(Lifo *ls) { return ls->length == 0; }
 
 Lifo * lifo_new() {
 

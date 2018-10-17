@@ -1,26 +1,48 @@
+#include "vector.h"
+
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct {
+typedef struct vector {
 	void **v;
 	int idx;
 	int capacity;
 } Vector;
 
-
 // INT_MAX*sizeof(int) = 8589934588: i have no ram to test it !!!
 // numfmt --to=si 8589934588 8,6G
 
-// inline int vector_maxSize() { return INT_MAX; }
+int vector_maxSize() { return INT_MAX; }
 
-// vector_clear() vct->idx = 0
-// vector_resize(): ricordarsi di rimettere l'indice idx
-// vector_capacity()
-// vector_shrinkToFit()
-// vector_data() ritorna l'array raw così com'è
+void vector_clear(Vector *vct) { vct->idx = 0; }
 
+bool vector_resize(Vector *vct, int len) {
 
+	void **nv = (void **)realloc(vct->v, len * sizeof(void *));
+	if (!nv) return false;
+
+	vct->v = nv;
+	vct->capacity = len;
+	vct->idx = vct->idx >= len ? len : vct->idx;
+
+	return true;
+} 
+
+int vector_capacity(Vector *vct) { 
+	return vct->capacity;
+}
+
+bool vector_shrinkToFit(Vector *vct) {
+	void **nv = (void **)realloc(vct->v, (vct->idx+1) * sizeof(void *));
+	if (!nv) return false;
+	vct->capacity = vct->idx+1;
+	return true;
+}
+
+void * vector_data(Vector *vct) {
+	return vct->v;
+}
 
 Vector * vector_new() {
 
@@ -44,8 +66,8 @@ void vector_free(Vector *vct) {
 	free(vct);
 }
 
-inline bool vector_isEmpty(Vector *vct) { return vct->idx == 0; }
-inline int  vector_length(Vector *vct)  { return vct->idx; }
+bool vector_isEmpty(Vector *vct) { return vct->idx == 0; }
+int  vector_length(Vector *vct)  { return vct->idx; }
 
 bool vector_pushBack(Vector *vct, void *e) {
 
@@ -80,17 +102,16 @@ void * vector_popBack(Vector *vct) {
 }
 
 // vector random access
-
-inline void * vector_access(Vector *vct, int at) { 
+void * vector_access(Vector *vct, int at) { 
 	return vct->v[at];
 }
 
-inline void vector_assign(Vector *vct, int at, void *e) {
+void vector_assign(Vector *vct, int at, void *e) {
 	vct->v[at] = e;
 }
 
 // get back the old element
-inline void * vector_replace(Vector *vct, int at, void *e) {
+void * vector_replace(Vector *vct, int at, void *e) {
 	void *ret = vct->v[at];
 	return (vct->v[at] = e), ret;
 }
