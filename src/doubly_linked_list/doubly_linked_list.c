@@ -153,7 +153,8 @@ int  linkedlist_length(LinkedList *ls) {
 }
 
 bool linkedlist_isEmpty(LinkedList *ls) { 
-	return ls->length == 0;
+	// return ls->length == 0;
+	return !ls->head->next; /* if there isn't another preallocated blk head point to tail and is itself the preallocated block */
 }
 
 void * linkedlist_front(LinkedList *ls) { 

@@ -1,6 +1,4 @@
-#include <limits.h>
 #include <stdbool.h>
-#include <stdlib.h>
 
 typedef struct vector Vector;
 
@@ -23,7 +21,7 @@ void * vector_popBack(Vector *vct);
 
 // vector random access
 void * vector_access(Vector *vct, int at);
-void vector_assign(Vector *vct, int at, void *e);
+void   vector_assign(Vector *vct, int at, void *e);
 
 // get back the old element
 void * vector_replace(Vector *vct, int at, void *e);

@@ -4,7 +4,7 @@ typedef struct node Node;
 typedef struct lifo Lifo;
 
 Lifo * lifo_new();
-void lifo_free(Lifo *ls);
+void   lifo_free(Lifo *ls);
 
 void * lifo_front(Lifo *ls);
 void * lifo_back(Lifo *ls);

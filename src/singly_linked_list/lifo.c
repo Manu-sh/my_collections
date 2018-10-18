@@ -23,7 +23,10 @@ so a->front it's a valid blk */
 void * lifo_front(Lifo *ls)   { return ls->front->data; }
 void * lifo_back(Lifo *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
 int    lifo_length(Lifo *ls)  { return ls->length;      }
-bool   lifo_isEmpty(Lifo *ls) { return ls->length == 0; }
+
+/* TODO avoid to use length */
+// bool   lifo_isEmpty(Lifo *ls) { return ls->length == 0; }
+bool   lifo_isEmpty(Lifo *ls) { return !ls->head->next; }
 int    lifo_maxSize()         { return INT_MAX;         }
 
 Lifo * lifo_new() {

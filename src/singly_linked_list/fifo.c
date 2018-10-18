@@ -20,10 +20,14 @@ typedef struct fifo {
 (the pre-allocated block) (ls->back == ls->head == ls->tail)
 so a->back it's a valid blk */
 
-int    fifo_maxSize() { return INT_MAX; }
+int    fifo_maxSize()         { return INT_MAX; }
 void * fifo_back(Fifo *ls)    { return ls->back->data;  }
 int    fifo_length(Fifo *ls)  { return ls->length;      }
-bool   fifo_isEmpty(Fifo *ls) { return ls->length == 0; }
+
+/* TODO avoid to use length */
+// bool   fifo_isEmpty(Fifo *ls) { return ls->length == 0; }
+
+bool   fifo_isEmpty(Fifo *ls) { return !ls->head->next; }
 void * fifo_front(Fifo *ls)   { return ls->head->data;  } /* there is always at least 1 blk */ 
 
 Fifo * fifo_new() {

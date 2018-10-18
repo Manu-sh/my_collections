@@ -1,4 +1,46 @@
 #include <stdio.h>
+#include "singly_linked_list/fifo.h"
+
+
+#if 0
+int main() {
+
+	Fifo *fifo = fifo_new();
+	printf("length: %d\n", fifo_length(fifo));
+	printf("empty: %d\n", fifo_isEmpty(fifo));
+
+	fifo_push(fifo, "hello");
+	// fifo_push(fifo, "world");
+
+	printf("length: %d\n", fifo_length(fifo));
+	printf("empty: %d\n", fifo_isEmpty(fifo));
+	fifo_free(fifo);
+	return 0;
+}
+#endif
+
+#if 0
+#include "doubly_linked_list/doubly_linked_list.h"
+
+int main() {
+	LinkedList *lst = linkedlist_new();
+
+	printf("length: %d\n", linkedlist_length(lst));
+	printf("empty: %d\n", linkedlist_isEmpty(lst));
+
+	linkedlist_pushFront(lst, "hello world");
+	linkedlist_pushFront(lst, "hello me");
+	puts( linkedlist_popFront(lst) );
+
+	printf("length: %d\n", linkedlist_length(lst));
+	printf("empty: %d\n", linkedlist_isEmpty(lst));
+
+	linkedlist_free(lst);
+	return 0;
+}
+#endif
+
+#if 0
 #include "vector/vector.h"
 
 int main() {
@@ -28,3 +70,4 @@ int main() {
 	vector_free(v);
 	return 0;
 }
+#endif
