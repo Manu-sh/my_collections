@@ -4,11 +4,12 @@ typedef struct node Node;
 typedef struct fifo Fifo;
 
 Fifo * fifo_new();
-void fifo_free(Fifo *ls);
+void   fifo_free(Fifo *ls);
 void * fifo_front(Fifo *ls);
 void * fifo_back(Fifo *ls);
-int fifo_length(Fifo *ls);
-bool fifo_isEmpty(Fifo *ls);
+int    fifo_length(Fifo *ls);
+bool   fifo_isEmpty(Fifo *ls);
+int    fifo_maxSize();
 
 Node * fifo_push(Fifo *ls, const void *e);
 void * fifo_pop(Fifo *ls);

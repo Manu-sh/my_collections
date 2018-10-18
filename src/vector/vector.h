@@ -7,13 +7,13 @@ typedef struct vector Vector;
 Vector * vector_new();
 void vector_free(Vector *vct);
 
-bool vector_isEmpty(Vector *vct);
-int vector_length(Vector *vct);
-int vector_maxSize();
-void vector_clear(Vector *vct);
-bool vector_resize(Vector *vct, int len);
-int vector_capacity(Vector *vct);
-bool vector_shrinkToFit(Vector *vct);
+bool   vector_isEmpty(Vector *vct);
+int    vector_length(Vector *vct);
+int    vector_maxSize();
+void   vector_clear(Vector *vct);
+bool   vector_resize(Vector *vct, int len);
+int    vector_capacity(Vector *vct);
+bool   vector_shrinkToFit(Vector *vct);
 void * vector_data(Vector *vct);
 
 bool vector_pushBack(Vector *vct, void *e);

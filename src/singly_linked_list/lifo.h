@@ -10,6 +10,7 @@ void * lifo_front(Lifo *ls);
 void * lifo_back(Lifo *ls);
 int    lifo_length(Lifo *ls);
 bool   lifo_isEmpty(Lifo *ls);
+int    lifo_maxSize();
 
 Node * lifo_push(Lifo *ls, const void *e);
 void * lifo_pop(Lifo *ls);

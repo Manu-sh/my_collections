@@ -1,25 +1,9 @@
 #include "binary_heap.h"
+#include "../common.h"
 
 #include <stdlib.h>
 #include <limits.h>
 #include <stdbool.h>
-
-typedef struct heap {
-	void **v;
-	bool (*lt)(void*,void*);
-	int idx;
-	int capacity;
-} Heap;
-
-#define __helper static __attribute__((always_inline)) inline
-
-#define SWAP(_TYPE_,A,B)          \
-	do {                      \
-		_TYPE_ _tmp_ = A; \
-		A = B;            \
-		B = _tmp_;        \
-	} while(0)
-
 
 /*
 	parent: j/2
@@ -28,6 +12,13 @@ typedef struct heap {
 
 	the root is v[1], v[0] is empty
 */
+
+typedef struct heap {
+	void **v;
+	bool (*lt)(void*,void*);
+	int idx;
+	int capacity;
+} Heap;
 
 __helper void fixUp(void **v, bool (*lt)(void*,void*), int k) {
 

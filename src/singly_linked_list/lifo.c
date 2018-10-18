@@ -1,6 +1,7 @@
 #include "lifo.h"
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 typedef struct node {
 	struct node *next;
@@ -23,6 +24,7 @@ void * lifo_front(Lifo *ls)   { return ls->front->data; }
 void * lifo_back(Lifo *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
 int    lifo_length(Lifo *ls)  { return ls->length;      }
 bool   lifo_isEmpty(Lifo *ls) { return ls->length == 0; }
+int    lifo_maxSize()         { return INT_MAX;         }
 
 Lifo * lifo_new() {
 

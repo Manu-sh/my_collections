@@ -53,11 +53,6 @@ static void * node_removeBetween(Node *a, Node *b) {
 	return ret;
 }
 
-// TODO adjust
-Node * linkedlist_pushBack(LinkedList *ls, const void *e);
-Node * linkedlist_pushFront(LinkedList *ls, const void *e);
-
-
 /* linear search, return the content of the first element in case of success, otherwise NULL */
 Node * find(const LinkedList *ls, bool (*eq)(void*,void*), const void *e) {
 

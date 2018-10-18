@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 typedef struct node {
 	struct node *next;
@@ -19,6 +20,7 @@ typedef struct fifo {
 (the pre-allocated block) (ls->back == ls->head == ls->tail)
 so a->back it's a valid blk */
 
+int    fifo_maxSize() { return INT_MAX; }
 void * fifo_back(Fifo *ls)    { return ls->back->data;  }
 int    fifo_length(Fifo *ls)  { return ls->length;      }
 bool   fifo_isEmpty(Fifo *ls) { return ls->length == 0; }
