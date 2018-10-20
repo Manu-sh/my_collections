@@ -1,5 +1,5 @@
 #include "binary_heap.h"
-#include "../common.h"
+#include "../ccommon.h"
 
 #include <stdlib.h>
 #include <limits.h>

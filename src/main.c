@@ -40,7 +40,7 @@ int main() {
 }
 #endif
 
-#if 0
+#if 1
 #include "vector/vector.h"
 
 int main() {

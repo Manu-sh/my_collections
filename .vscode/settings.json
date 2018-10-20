@@ -1,5 +1,8 @@
 {
 	"files.associations": {
-		"fifo.h": "c"
+		"fifo.h": "c",
+		"limits.h": "c",
+		"gvector.h": "c",
+		"ccommon.h": "c"
 	}
 }
