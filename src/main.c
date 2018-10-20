@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#if 1
+#if 0
 #include "vector/vector_char.h"
 
 int main() {

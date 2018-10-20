@@ -5,6 +5,8 @@
 		"gvector.h": "c",
 		"ccommon.h": "c",
 		"vector.h": "c",
-		"vector_int.h": "c"
+		"vector_int.h": "c",
+		"binary_heap.h": "c",
+		"gbinary_heap.h": "c"
 	}
 }

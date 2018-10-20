@@ -21,7 +21,7 @@ char  vector_char_popBack(Vector *vct);
 
 // vector random access
 char  vector_char_access(Vector *vct, int at);
-void   vector_char_assign(Vector *vct, int at, char e);
+void  vector_char_assign(Vector *vct, int at, char e);
 
 // get back the old element
 char vector_char_replace(Vector *vct, int at, char e);
