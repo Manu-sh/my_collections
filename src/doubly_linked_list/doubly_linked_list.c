@@ -1,3 +1,5 @@
+#include "doubly_linked_list.h"
+
 #include <stdlib.h>
 #include <stdbool.h>
 
@@ -10,7 +12,7 @@ typedef struct node {
 	void *data;
 } Node;
 
-typedef struct {
+typedef struct linkedlist {
 	Node *head;
 	Node *tail; /* point to a preallocated block without data */
 	int length; /* for obvious reasons the tail isn't count as part of length */
@@ -50,11 +52,6 @@ static void * node_removeBetween(Node *a, Node *b) {
 	free(tofree);
 	return ret;
 }
-
-// TODO adjust
-Node * linkedlist_pushBack(LinkedList *ls, const void *e);
-Node * linkedlist_pushFront(LinkedList *ls, const void *e);
-
 
 /* linear search, return the content of the first element in case of success, otherwise NULL */
 Node * find(const LinkedList *ls, bool (*eq)(void*,void*), const void *e) {
@@ -151,10 +148,22 @@ void linkedlist_free(LinkedList *ls) {
 	free(p), free(ls);
 }
 
-inline int    linkedlist_length(LinkedList *ls)  { return ls->length;      }
-inline bool   linkedlist_isEmpty(LinkedList *ls) { return ls->length == 0; }
-inline void * linkedlist_front(LinkedList *ls)   { return ls->head->data;  } /* there is always at least 1 blk */
-inline void * linkedlist_back(LinkedList *ls)    { return linkedlist_isEmpty(ls) ? NULL : ls->tail->prev->data; } /* prev could be NULL */
+int  linkedlist_length(LinkedList *ls) { 
+	return ls->length;
+}
+
+bool linkedlist_isEmpty(LinkedList *ls) { 
+	// return ls->length == 0;
+	return !ls->head->next; /* if there isn't another preallocated blk head point to tail and is itself the preallocated block */
+}
+
+void * linkedlist_front(LinkedList *ls) { 
+	return ls->head->data;  /* there is always at least 1 blk */
+}
+
+void * linkedlist_back(LinkedList *ls) { 
+	return linkedlist_isEmpty(ls) ? NULL : ls->tail->prev->data;  /* prev could be NULL */
+}
 
 Node * linkedlist_pushBack(LinkedList *ls, const void *e) {
 

@@ -1,6 +1,8 @@
-#pragma once
+#include "binary_heap.h"
+#include "../common.h"
 
 #include <stdlib.h>
+#include <limits.h>
 #include <stdbool.h>
 
 /*
@@ -11,57 +13,14 @@
 	the root is v[1], v[0] is empty
 */
 
-typedef struct {
+typedef struct heap {
 	void **v;
 	bool (*lt)(void*,void*);
-	int idx; /* index to the last element into heap 0 if is empty */
+	int idx;
 	int capacity;
 } Heap;
 
-// TODO i have no ram to test it
-// INT_MAX-1 because heap start at 1
-// int heap_maxSize() { return INT_MAX-1; }
-
-/* provide a less_than() or greater_then() function
-respectively if you want max_heap or min_heap */
-Heap * heap_new(bool (*lt)(void*,void*));
-
-/* free the memory */
-void   heap_free(Heap *hp);
-
-/* true if there are no elements */
-inline bool heap_isEmpty(const Heap *hp);
-
-/* retrieve but not remove the root */
-inline void * heap_peek(const Heap *hp);
-
-/* number of elements that heap contains */
-inline int heap_length(const Heap *hp);
-
-/* add an element */
-bool   heap_add(Heap *hp, const void *e);
-
-/* it dosn't check if heap is empty so you MUST check it calling heap_isEmpty() */
-void * heap_remove(Heap *hp);
-
-/* replace the root with another element then fix the heap if is needed
-return the previous root on success, NULL if an error is occurred.
-
-More efficient than get followed by add, since only need to balance once, 
-not twice, and appropriate for fixed-size heaps. */
-void * heap_replace(Heap *hp, const void *e);
-
-
-
-#define SWAP(_TYPE_,A,B)          \
-	do {                      \
-		_TYPE_ _tmp_ = A; \
-		A = B;            \
-		B = _tmp_;        \
-	} while(0)
-
-
-static void fixUp(void **v, bool (*lt)(void*,void*), int k) {
+__helper void fixUp(void **v, bool (*lt)(void*,void*), int k) {
 
 	while (k > 1 && lt(v[k>>1], v[k])) {
 		SWAP(void*, v[k>>1], v[k]);
@@ -69,7 +28,7 @@ static void fixUp(void **v, bool (*lt)(void*,void*), int k) {
 	}
 }
 
-static void fixDown(void **v, bool (*lt)(void*,void*), int p, int to) {
+__helper void fixDown(void **v, bool (*lt)(void*,void*), int p, int to) {
 
 #if 0
 	for (int j; (j = p << 1) <= to; p = j) {
@@ -100,13 +59,18 @@ static void fixDown(void **v, bool (*lt)(void*,void*), int p, int to) {
 	if (p <= to && p != j && lt(v[p], v[j]))
 		SWAP(void*, v[p], v[j]);
 #endif
-	// TODO si potrebbe provare a trattarlo come array circolare
+
 }
 
 
+/* INT_MAX-1 because heap start at 1 */
+int heap_maxSize() {
+	return INT_MAX-1;
+}
 
-/*  provide a less_than() or greater_then() function
-    respectively if you want max_heap or min_heap */
+/* provide a less_than() or greater_then() function 
+respectively if you want max_heap or min_heap */
+
 Heap * heap_new(bool (*lt)(void*,void*)) {
 
 	Heap *hp;
@@ -125,15 +89,28 @@ Heap * heap_new(bool (*lt)(void*,void*)) {
 	return hp;
 }
 
-void heap_free(Heap *hp) { if (!hp) return; free(hp->v); free(hp); }
 
-inline bool heap_isEmpty(const Heap *hp) { return hp->idx == 0; }
+void heap_free(Heap *hp) { 
+	if (!hp) return; 
+	free(hp->v); free(hp); 
+}
+
+
+bool heap_isEmpty(const Heap *hp) { 
+	return hp->idx == 0; 
+}
+
 
 /* retrieve but not remove the root */
-inline void * heap_peek(const Heap *hp) { return heap_isEmpty(hp) ? NULL : hp->v[1]; }
+void * heap_peek(const Heap *hp) { 
+	return heap_isEmpty(hp) ? NULL : hp->v[1]; 
+}
+
 
 /* number of elements that heap contains */
-inline int heap_length(const Heap *hp) { return hp->idx; }
+int heap_length(const Heap *hp) {
+	 return hp->idx;
+}
 
 
 bool heap_add(Heap *hp, const void *e) {
@@ -150,6 +127,7 @@ bool heap_add(Heap *hp, const void *e) {
 	hp->v[++hp->idx] = (void *)e;
 	fixUp(hp->v, hp->lt, hp->idx);
 	return true;
+
 }
 
 /* it dosn't check if heap is empty so you MUST check it */
@@ -171,14 +149,15 @@ void * heap_remove(Heap *hp) {
 	}
 
 	return ret;
+
 }
 
-/* replace the root with another element then fix the heap if is needed
-   return the previous root on success, NULL if an error is occurred.
 
-   More efficient than get followed by add, since only need to balance once, 
-   not twice, and appropriate for fixed-size heaps. 
-*/
+/* replace the root with another element then fix the heap if is needed
+return the previous root on success, NULL if an error is occurred.
+More efficient than get followed by add, since only need to balance once, 
+not twice, and appropriate for fixed-size heaps. */
+
 void * heap_replace(Heap *hp, const void *e) {
 
 	void * ret = (void *)e;

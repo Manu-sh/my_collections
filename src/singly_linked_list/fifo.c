@@ -1,12 +1,15 @@
+#include "fifo.h"
+
 #include <stdlib.h>
 #include <stdbool.h>
+#include <limits.h>
 
 typedef struct node {
 	struct node *next;
 	void *data;
 } Node;
 
-typedef struct {
+typedef struct fifo {
 	Node *head;
 	Node *tail; /* point to a preallocated block without data */
 	Node *back;
@@ -17,10 +20,15 @@ typedef struct {
 (the pre-allocated block) (ls->back == ls->head == ls->tail)
 so a->back it's a valid blk */
 
-inline void * fifo_back(Fifo *ls)    { return ls->back->data;  }
-inline int    fifo_length(Fifo *ls)  { return ls->length;      }
-inline bool   fifo_isEmpty(Fifo *ls) { return ls->length == 0; }
-inline void * fifo_front(Fifo *ls)   { return ls->head->data;  } /* there is always at least 1 blk */ 
+int    fifo_maxSize()         { return INT_MAX; }
+void * fifo_back(Fifo *ls)    { return ls->back->data;  }
+int    fifo_length(Fifo *ls)  { return ls->length;      }
+
+/* TODO avoid to use length */
+// bool   fifo_isEmpty(Fifo *ls) { return ls->length == 0; }
+
+bool   fifo_isEmpty(Fifo *ls) { return !ls->head->next; }
+void * fifo_front(Fifo *ls)   { return ls->head->data;  } /* there is always at least 1 blk */ 
 
 Fifo * fifo_new() {
 

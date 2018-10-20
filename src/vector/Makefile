@@ -1,8 +1,10 @@
 CFLAGS=-Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic
 .PHONY: all clean test
 
-all: main.c fifo.h lifo.h
-	$(CC)  -o main main.c $(CFLAGS) 
+all: vector.o
+
+%.o: %.c %.h
+	$(CC) $(CFLAGS) -c $< -o ../$@
 
 clean:
-	rm -f main
+	rm -f *.o
