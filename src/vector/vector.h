@@ -9,10 +9,12 @@ bool   vector_isEmpty(Vector *vct);
 int    vector_length(Vector *vct);
 int    vector_maxSize();
 void   vector_clear(Vector *vct);
+
+// TODO document
 bool   vector_resize(Vector *vct, int len);
 int    vector_capacity(Vector *vct);
 bool   vector_shrinkToFit(Vector *vct);
-void * vector_data(Vector *vct);
+void ** vector_data(Vector *vct);
 
 bool vector_pushBack(Vector *vct, void *e);
 

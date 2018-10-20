@@ -3,6 +3,8 @@
 		"fifo.h": "c",
 		"limits.h": "c",
 		"gvector.h": "c",
-		"ccommon.h": "c"
+		"ccommon.h": "c",
+		"vector.h": "c",
+		"vector_int.h": "c"
 	}
 }

@@ -1,8 +1,58 @@
 #include <stdio.h>
-#include "singly_linked_list/fifo.h"
 
+#if 1
+#include "vector/vector_char.h"
+
+int main() {
+
+	Vector *v = vector_char_new();
+
+	for (char i = 'a'; i < 'z'; i++) {
+		vector_char_pushBack(v, i);
+		printf("%c added\n", i);
+	}
+
+	printf("length: %d\n", vector_char_length(v));
+	printf("capacity: %d\n", vector_char_capacity(v));
+
+	printf("length: %d\n", vector_char_length(v));
+	printf("capacity: %d\n", vector_char_capacity(v));
+
+	vector_char_free(v);
+	return 0;
+}
+#endif
 
 #if 0
+#include "vector/vector_int.h"
+
+int main() {
+
+	Vector *v = vector_int_new();
+
+	for (int i = 0; i < 10; i++) {
+		vector_int_pushBack(v, i);
+		printf("%d added\n", i);
+	}
+
+	printf("length: %d\n", vector_int_length(v));
+	printf("capacity: %d\n", vector_int_capacity(v));
+
+	// vector_int_resize(v, 0);
+	// vector_int_shrinkToFit(v);
+	vector_int_clear(v);
+	vector_int_shrinkToFit(v);
+
+	printf("length: %d\n", vector_int_length(v));
+	printf("capacity: %d\n", vector_int_capacity(v));
+
+	vector_int_free(v);
+	return 0;
+}
+#endif
+
+#if 0
+#include "singly_linked_list/fifo.h"
 int main() {
 
 	Fifo *fifo = fifo_new();
@@ -40,7 +90,7 @@ int main() {
 }
 #endif
 
-#if 1
+#if 0
 #include "vector/vector.h"
 
 int main() {

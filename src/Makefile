@@ -12,7 +12,7 @@ objects:
 	make -C singly_linked_list
 	make -C vector
 
-lds.a: lds.a(binary_heap.o doubly_linked_list.o fifo.o lifo.o vector.o)
+lds.a: lds.a(binary_heap.o doubly_linked_list.o fifo.o lifo.o vector.o vector_int.o vector_char.o)
 	rm *.o
 
 clean:

@@ -21,7 +21,7 @@ typedef struct vector {
 	int capacity;
 } Vector;
 
-__always_inline TYPE _(data)(Vector *vct) { return vct->v; }
+__always_inline TYPE * _(data)(Vector *vct) { return vct->v; }
 __always_inline bool _(isEmpty)(Vector *vct) { return vct->idx == 0; }
 __always_inline int  _(length)(Vector *vct)  { return vct->idx; }
 __always_inline int  _(maxSize)() { return INT_MAX; }
