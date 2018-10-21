@@ -1,10 +1,14 @@
 CFLAGS=-Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic
 .PHONY: all clean test
 
-all: binary_heap.o binary_heap_int.o
+TST_TARGET=binary_heap_int
+
+test: $(TST_TARGET).o
+	$(CC) $(CFLAGS) -o test test.c $(TST_TARGET).o
+	./test
 
 %.o: %.c %.h
-	$(CC) $(CFLAGS) -c $< -o ../$@
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f *.o
+	rm -f *.o test

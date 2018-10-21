@@ -3,4 +3,4 @@
 #define TYPE int
 #define FNTYPE _int_
 
-#include "../generics/gbinary_heap/gbinary_heap.h"
+#include "../../generics/gbinary_heap/gbinary_heap.h"

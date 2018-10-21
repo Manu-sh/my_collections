@@ -2,6 +2,11 @@
 
 typedef struct vector Vector;
 
+/* an extra methods not present into gvector */
+char vector_char_back(Vector *vct);
+
+
+
 Vector * vector_char_new();
 void vector_char_free(Vector *vct);
 
