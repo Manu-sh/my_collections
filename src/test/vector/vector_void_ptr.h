@@ -2,6 +2,6 @@
 #undef TYPEID
 
 #define TYPEID void_ptr
-#define TYPENAME const void *
+#define TYPENAME void *
 #include "../../generics/gvector/gvector.h"
 #include "gvector_extension.h"

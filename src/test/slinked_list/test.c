@@ -8,7 +8,8 @@ int main() {
 	fifo_int *fifo = fifo_int_new();
 	lifo_int *lifo = lifo_int_new();
 
-	for (int i = 0; i < 10; i++) {
+	int i;
+	for (i = 0; i < 10; i++) {
 		fifo_int_push(fifo, i);
 		lifo_int_push(lifo, i);
 		printf("%d fifo top\n", fifo_int_top(fifo));

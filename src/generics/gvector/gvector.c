@@ -1,26 +1,25 @@
-#include "../ccommon.h"
+#include "../ccommon.c"
 
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
-typedef struct STRUCT {
+struct STRUCT {
 	TYPENAME *v;
 	int idx;
 	int capacity;
-} STRUCT;
+};
 
-__always_inline TYPENAME * _(data)(STRUCT *vct) { return vct->v; }
-__always_inline bool _(isEmpty)(STRUCT *vct) { return vct->idx == 0; }
-__always_inline int  _(length)(STRUCT *vct)  { return vct->idx; }
+__always_inline TYPENAME * _(data)(const STRUCT *vct) { return vct->v; }
+__always_inline bool _(isEmpty)(const STRUCT *vct) { return vct->idx == 0; }
+__always_inline int  _(length)(const STRUCT *vct)  { return vct->idx; }
 __always_inline int  _(maxSize)() { return INT_MAX; }
 __always_inline void _(clear)(STRUCT *vct) { vct->idx = 0; }
 __always_inline int  _(capacity)(STRUCT *vct) { return vct->capacity; }
 
-// vector random access
-__always_inline TYPENAME _(access)(STRUCT *vct, int at) { return vct->v[at]; }
+/* vector random access */
+__always_inline TYPENAME _(access)(const STRUCT *vct, int at) { return vct->v[at]; }
 __always_inline void _(assign)(STRUCT *vct, int at, const TYPENAME e) { vct->v[at] = (TYPENAME)e; }
-
 
 __always_inline bool _(resize)(STRUCT *vct, int len) {
 
@@ -79,7 +78,7 @@ __always_inline bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
 }
 
 /* it dosn't check if heap is empty so you MUST check it calling vector_isEmpty() */
-__always_inline TYPENAME  _(popBack)(STRUCT *vct) {
+__always_inline TYPENAME _(popBack)(STRUCT *vct) {
 
 	TYPENAME ret = vct->v[--vct->idx];
        
@@ -95,7 +94,7 @@ __always_inline TYPENAME  _(popBack)(STRUCT *vct) {
 	return ret;
 }
 
-// get back the old element
+/* get back the old element */
 __always_inline TYPENAME _(replace)(STRUCT *vct, int at, const TYPENAME e) {
 	TYPENAME ret = vct->v[at];
 	return (vct->v[at] = (TYPENAME)e), ret;

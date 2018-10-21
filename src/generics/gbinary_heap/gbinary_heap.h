@@ -1,7 +1,7 @@
-#undef CLASSNAME
+#undef  CLASSNAME
 #define CLASSNAME binary_heap
 
-#include "../hcommon.h"
+#include "../ccommon.h"
 
 int _(maxSize)();
 

@@ -16,6 +16,14 @@
 		"gbinary_heap.c": "cpp",
 		"dlinked_list_char.h": "c",
 		"fifo_int.h": "c",
-		"gfifo.h": "c"
+		"gfifo.h": "c",
+		"vector_void_ptr.h": "c",
+		"array": "c",
+		"deque": "c",
+		"list": "c",
+		"vector": "c",
+		"string_view": "c",
+		"dlinked_list_dequeue_char.h": "c",
+		"gdlinked_list_dequeue.h": "c"
 	}
 }

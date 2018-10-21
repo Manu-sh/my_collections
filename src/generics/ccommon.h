@@ -1,14 +1,26 @@
-/* only g*.c should include this header */
+/* used only by ccommon.c */
+#define CCOMMON_H
 
-#pragma once
-#define __always_inline __attribute__((always_inline)) inline
-#define __helper static __always_inline
+/* CLASSNAME & TYPENAME MUST BE DEFINED BEFORE INCLUDING THIS HDR
+	example:
+		#define CLASSNAME vector
+		#define TYPEID char_ptr
+		#define TYPENAME char *
+*/
 
-#include "hcommon.h"
+/* #pragma once */
+#include <stdbool.h>
 
-#define SWAP(_TYPENAME_,A,B)          \
-	do {                      \
-		_TYPENAME_ _tmp_ = A; \
-		A = B;            \
-		B = _tmp_;        \
-	} while(0)
+#if !defined(CLASSNAME) || !defined(TYPENAME) || !defined(TYPEID)
+	#error "you must define CLASSNAME & TYPENAME & TYPEID"
+#endif
+
+#define UNDERSCORE _
+#define EMPTY_DEF
+
+#define TOKENPASTE(_A_, _B_, _C_) _A_ ## _B_ ## _C_
+#define TKPASTE(_A_, _B_, _C_) TOKENPASTE(_A_, _B_, _C_)
+
+#define _(_NAME_) TKPASTE(CLASSNAME, TKPASTE(UNDERSCORE, TYPEID, UNDERSCORE), _NAME_) /* _(popBack) -> vector_char_popBack */
+#define STRUCT    TKPASTE(CLASSNAME, UNDERSCORE, TYPEID) /* example: vector_char */
+typedef struct STRUCT STRUCT;
