@@ -1,4 +1,4 @@
-/* only g*.h should include this header */
+/* only g*.c should include this header */
 
 #pragma once
 #define __always_inline __attribute__((always_inline)) inline

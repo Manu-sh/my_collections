@@ -1,9 +1,10 @@
+#undef CLASSNAME
 #define CLASSNAME lifo
 #include "../hcommon.h"
 
 STRUCT * _(new)();
 void     _(free)(STRUCT *ls);
-TYPENAME _(front)(STRUCT *ls);
+TYPENAME _(top)(STRUCT *ls);
 TYPENAME _(back)(STRUCT *ls);
 int      _(length)(STRUCT *ls);
 bool     _(isEmpty)(STRUCT *ls);

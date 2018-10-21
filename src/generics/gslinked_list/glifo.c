@@ -22,7 +22,7 @@ typedef struct STRUCT {
 so a->front it's a valid blk */
 
 // TODO test
-TYPENAME  _(front)(STRUCT *ls)  { return ls->front->data; }
+TYPENAME  _(top)(STRUCT *ls)  { return ls->front->data; }
 TYPENAME  _(back)(STRUCT *ls)   { return ls->tail->data;  } /* there is always at least 1 blk */ 
 int       _(length)(STRUCT *ls) { return ls->length;      }
 bool   _(isEmpty)(STRUCT *ls)   { return !ls->head->next; }

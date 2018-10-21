@@ -1,4 +1,4 @@
-// #pragma once
+#undef CLASSNAME
 #define CLASSNAME dlinked_list
 #include "../hcommon.h"
 

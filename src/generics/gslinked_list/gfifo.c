@@ -25,7 +25,7 @@ int       _(maxSize)()           { return INT_MAX; }
 TYPENAME  _(back)(STRUCT *ls)    { return ls->back->data;  }
 int       _(length)(STRUCT *ls)  { return ls->length;      }
 bool      _(isEmpty)(STRUCT *ls) { return !ls->head->next; }
-TYPENAME  _(front)(STRUCT *ls)   { return ls->head->data;  } /* there is always at least 1 blk */ 
+TYPENAME  _(top)(STRUCT *ls)   { return ls->head->data;  } /* there is always at least 1 blk */ 
 
 STRUCT * _(new)() {
 
@@ -67,11 +67,11 @@ bool _(push)(STRUCT *ls, const TYPENAME e) {
                 return false;
 
         /* save into a previous preallocated block */
-        ls->tail->data = (TYPENAME )e;
-	ls->tail->next = next; /* NODE_PUSH_BACK() */
+        ls->tail->data = (TYPENAME)e;
+        ls->tail->next = next; /* NODE_PUSH_BACK() */
 
         /* tail must point to a preallocated block without data */
-	ls->back = ls->tail;
+        ls->back = ls->tail;
         ls->tail = next;
 
         ++ls->length;
@@ -87,7 +87,7 @@ TYPENAME  _(pop)(STRUCT *ls) {
 
         if (!ls->head->next) { /* don't free nothing if is the last blk */
                 // ls->head->data = NULL;
-		ls->back       = ls->head;
+                ls->back       = ls->head;
                 return ret;
         }
 

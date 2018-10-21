@@ -15,6 +15,7 @@
 		"binary_heap_int.h": "c",
 		"gbinary_heap.c": "cpp",
 		"dlinked_list_char.h": "c",
-		"fifo_int.h": "c"
+		"fifo_int.h": "c",
+		"gfifo.h": "c"
 	}
 }
