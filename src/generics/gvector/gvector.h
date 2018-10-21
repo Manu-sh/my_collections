@@ -1,3 +1,4 @@
+// #pragma once
 #define CLASSNAME vector
 
 #include "../hcommon.h"
