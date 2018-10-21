@@ -1,7 +1,7 @@
 #undef TYPENAME
 #undef TYPEID
 
-#define TYPEID int
-#define TYPENAME int
+#define TYPEID void_ptr
+#define TYPENAME const void *
 #include "../../generics/gvector/gvector.h"
 #include "gvector_extension.h"

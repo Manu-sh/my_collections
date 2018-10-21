@@ -14,6 +14,7 @@
 		"gvector_extension.h": "c",
 		"binary_heap_int.h": "c",
 		"gbinary_heap.c": "cpp",
-		"dlinked_list_char.h": "c"
+		"dlinked_list_char.h": "c",
+		"fifo_int.h": "c"
 	}
 }

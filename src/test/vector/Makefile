@@ -4,9 +4,10 @@ CFLAGS=-Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function 
 
 TST_TARGET_A=vector_char
 TST_TARGET_B=vector_int
+TST_TARGET_C=vector_void_ptr
 
-all: $(TST_TARGET_A).o $(TST_TARGET_B).o
-	$(CC) $(CFLAGS) -o test test.c $(TST_TARGET_A).o $(TST_TARGET_B).o
+all: $(TST_TARGET_A).o $(TST_TARGET_B).o $(TST_TARGET_C).o
+	$(CC) $(CFLAGS) -o test test.c $(TST_TARGET_A).o $(TST_TARGET_B).o $(TST_TARGET_C).o
 
 %.o: %.c %.h
 	$(CC) $(CFLAGS) -c $< -o $@

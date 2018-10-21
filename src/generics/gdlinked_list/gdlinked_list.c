@@ -145,7 +145,7 @@ TYPENAME _(popBack)(STRUCT *ls) {
     	ret    = ls->tail->prev->data;
 
 	ls->tail->prev->next = NULL;
-	ls->tail->prev->data = NULL;
+	// ls->tail->prev->data = NULL;
 
 	/* tail must point to a preallocated block */
 	ls->tail             = ls->tail->prev;

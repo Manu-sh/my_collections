@@ -98,5 +98,5 @@ __always_inline TYPENAME  _(popBack)(STRUCT *vct) {
 // get back the old element
 __always_inline TYPENAME _(replace)(STRUCT *vct, int at, const TYPENAME e) {
 	TYPENAME ret = vct->v[at];
-	return (vct->v[at] = e), ret;
+	return (vct->v[at] = (TYPENAME)e), ret;
 }
