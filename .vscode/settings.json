@@ -1,5 +1,21 @@
 {
 	"files.associations": {
-		"fifo.h": "c"
+		"fifo.h": "c",
+		"limits.h": "c",
+		"gvector.h": "c",
+		"ccommon.h": "c",
+		"vector.h": "c",
+		"vector_int.h": "c",
+		"binary_heap.h": "c",
+		"gbinary_heap.h": "c",
+		"vector_char.h": "c",
+		"hcommon.h": "c",
+		"hgvector.h": "c",
+		"gvector_extension.h": "c",
+		"binary_heap_int.h": "c",
+		"gbinary_heap.c": "cpp",
+		"dlinked_list_char.h": "c",
+		"fifo_int.h": "c",
+		"gfifo.h": "c"
 	}
 }
