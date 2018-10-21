@@ -1,5 +1,43 @@
 #include <stdio.h>
 
+#if 1
+#include "binary_heap/binary_heap_int.h"
+
+// change the < for different heap type
+// #define MAX_HEAP
+
+bool lt(int a, int b) 
+{
+	 return a < b;
+}
+
+#include <assert.h>
+#include <time.h>
+#include <stdlib.h>
+#include <unistd.h>
+
+int main() {
+
+	srand(time(0));
+
+	Heap *hp = heap_int_new(lt);
+	assert(hp);
+
+	for (int i = 0; i < 100; i++)
+		heap_int_add(hp, rand());
+
+	printf("length: %d\n", heap_int_length(hp));
+
+	while (!heap_int_isEmpty(hp))
+		printf("%d\n", heap_int_remove(hp));
+
+	heap_int_free(hp);
+	return 0;
+}
+#endif
+
+
+
 #if 0
 #include "vector/vector_char.h"
 
@@ -9,7 +47,7 @@ int main() {
 
 	for (char i = 'a'; i < 'z'; i++) {
 		vector_char_pushBack(v, i);
-		printf("%c added\n", i);
+		printf("%c added\n", vector_char_back(vct));
 	}
 
 	printf("length: %d\n", vector_char_length(v));
@@ -23,6 +61,7 @@ int main() {
 }
 #endif
 
+
 #if 0
 #include "vector/vector_int.h"
 
@@ -32,7 +71,7 @@ int main() {
 
 	for (int i = 0; i < 10; i++) {
 		vector_int_pushBack(v, i);
-		printf("%d added\n", i);
+		printf("%d added\n", vector_int_back(vct));
 	}
 
 	printf("length: %d\n", vector_int_length(v));

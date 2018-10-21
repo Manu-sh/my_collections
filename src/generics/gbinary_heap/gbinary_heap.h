@@ -14,6 +14,7 @@
 #include <limits.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <assert.h>
 
 /*
 	parent: j/2
@@ -113,7 +114,8 @@ __always_inline bool _(isEmpty)(const Heap *hp) {
 
 /* retrieve but not remove the root */
 __always_inline TYPE  _(peek)(const Heap *hp) { 
-	return _(isEmpty)(hp) ? NULL : hp->v[1]; 
+	assert(!_(isEmpty)(hp));
+	return hp->v[1]; 
 }
 
 
@@ -136,6 +138,7 @@ __always_inline bool _(add)(Heap *hp, const TYPE e) {
 
 	hp->v[++hp->idx] = (TYPE )e;
 	fixUp(hp->v, hp->lt, hp->idx);
+
 	return true;
 
 }
@@ -171,8 +174,7 @@ not twice, and appropriate for fixed-size heaps. */
 __always_inline TYPE _(replace)(Heap *hp, const TYPE e) {
 
 	TYPE  ret = (TYPE )e;
-	if (_(isEmpty)(hp))
-		return NULL;
+	assert(!_(isEmpty)(hp));
 
 	SWAP(TYPE, ret, hp->v[1]);
 	fixDown(hp->v, hp->lt, 1, hp->idx-1);

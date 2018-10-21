@@ -3,4 +3,4 @@
 #define TYPE void *
 #define FNTYPE _
 
-#include "gbinary_heap.h"
+#include "../generics/gbinary_heap/gbinary_heap.h"

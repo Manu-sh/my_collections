@@ -3,4 +3,4 @@
 #define TYPE void *
 #define FNTYPE _
 
-#include "gvector.h"
+#include "../generics/gvector/gvector.h"

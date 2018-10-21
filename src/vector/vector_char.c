@@ -3,4 +3,4 @@
 #define TYPE char
 #define FNTYPE _char_
 
-#include "gvector.h"
+#include "../generics/gvector/gvector.h"
