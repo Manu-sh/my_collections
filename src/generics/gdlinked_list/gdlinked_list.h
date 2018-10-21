@@ -1,23 +1,35 @@
-#include "doubly_linked_list.h"
+#pragma once
 
-#include <stdlib.h>
-#include <stdbool.h>
+#ifdef FNPREFIX
+	#error "shouldn't be defined"
+#endif
+
+#if !defined(TYPENAME) || !defined(FNTYPENAME)
+	#error "TYPENAME and FNAME must be defined before including this file"
+#endif
+
+#define FNPREFIX dlinkedlist
+#define STRUCT _(FNPREFIX)
+#include "../ccommon.h"
+
 #include <limits.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <assert.h>
 
 // TODO provide an iterator C++ style for support an easy insertion
-// TODO linkedlist_maxSize() i have no ram to test it
 
 typedef struct node {
 	struct node *next;
 	struct node *prev;
-	void *data;
+	TYPENAME data;
 } Node;
 
-typedef struct linkedlist {
+typedef struct STRUCT {
 	Node *head;
 	Node *tail; /* point to a preallocated block without data */
 	int length; /* for obvious reasons the tail isn't count as part of length */
-} LinkedList;
+} STRUCT;
 
 /* b should be an empty node only data field should contain non-null value */
 #define NODE_PUSH_BACK(_ANODE_,_BNODE_)  \
@@ -45,12 +57,12 @@ typedef struct linkedlist {
 	} while(0)                                    \
 
 
-int linkedlist_maxSize() { return INT_MAX-1; }
+int _(maxSize)() { return INT_MAX-1; }
 
-LinkedList * linkedlist_new() {
+STRUCT * _(new()) {
 
-	LinkedList *ls;
-	if (!(ls = (LinkedList *)calloc(1, sizeof(LinkedList))))
+	STRUCT *ls;
+	if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
 		return NULL;
 
 	/* pre-allocation */
@@ -63,7 +75,7 @@ LinkedList * linkedlist_new() {
 	return ls;
 }
 
-void linkedlist_free(LinkedList *ls) {
+void _(free)(STRUCT *ls) {
 
 	Node *p;
 
@@ -77,27 +89,27 @@ void linkedlist_free(LinkedList *ls) {
 	free(p), free(ls);
 }
 
-int  linkedlist_length(LinkedList *ls) { 
+int  _(length)(STRUCT *ls) { 
 	return ls->length;
 }
 
-bool linkedlist_isEmpty(LinkedList *ls) { 
+bool _(isEmpty)(STRUCT *ls) { 
 	// return ls->length == 0;
 	return !ls->head->next; /* if there isn't another preallocated blk head point to tail and is itself the preallocated block */
 }
 
-void * linkedlist_front(LinkedList *ls) { 
+TYPENAME _(front)(STRUCT *ls) { 
 	return ls->head->data;  /* there is always at least 1 blk */
 }
 
-void * linkedlist_back(LinkedList *ls) { 
+TYPENAME _(back)(STRUCT *ls) { 
 	// return linkedlist_isEmpty(ls) ? NULL : ls->tail->prev->data;  /* prev could be NULL */
 
-	assert(!linkedlist_isEmpty(ls));
+	assert(!_(isEmpty)(ls));
 	return ls->tail->prev->data;
 }
 
-bool linkedlist_pushBack(LinkedList *ls, const void *e) {
+bool _(pushBack)(STRUCT *ls, const TYPENAME e) {
 
 	Node *next;
 
@@ -106,7 +118,7 @@ bool linkedlist_pushBack(LinkedList *ls, const void *e) {
 		return false;
 
 	/* save into a previous preallocated block */
-	ls->tail->data = (void *)e;
+	ls->tail->data = (TYPENAME)e;
 	NODE_PUSH_BACK(ls->tail, next);
 
 	/* tail must point to a preallocated block without data */
@@ -116,14 +128,14 @@ bool linkedlist_pushBack(LinkedList *ls, const void *e) {
 	return true;
 }
 
-bool linkedlist_pushFront(LinkedList *ls, const void *e) {
+bool _(pushFront)(STRUCT *ls, const TYPENAME e) {
 
 	Node *prev;
 
 	if (!(prev = (Node *)calloc(1, sizeof(Node))))
 		return false;
 
-	prev->data = (void *)e;
+	prev->data = (TYPENAME)e;
 	NODE_PUSH_FRONT(ls->head, prev);
 	ls->head = prev;
 
@@ -131,14 +143,14 @@ bool linkedlist_pushFront(LinkedList *ls, const void *e) {
 	return true;
 }
 
-void * linkedlist_popBack(LinkedList *ls) {
+TYPENAME _(popBack)(STRUCT *ls) {
 
-	void *ret;
+	TYPENAME ret;
 	Node *tofree;
 
 	/* check tail->prev (if tail == head list is empty and
 	   heap->prev->data result in an illegal access) */
-	assert(!linkedlist_isEmpty(ls));
+	assert(!_(isEmpty(ls));
 
 	/* tail point to a pre-allocate block without data (always) */
 	tofree = ls->tail;
@@ -155,10 +167,10 @@ void * linkedlist_popBack(LinkedList *ls) {
 	return ret;
 }
 
-void * linkedlist_popFront(LinkedList *ls) {
+TYPENAME _(popFront)(STRUCT *ls) {
 
 	/* there is always at least one block */
-	void *ret    = ls->head->data;
+	TYPENAME ret    = ls->head->data;
 	Node *tofree = ls->head;
 
 	if (!ls->head->next) { /* don't free nothing if is the last blk */
@@ -179,7 +191,7 @@ void * linkedlist_popFront(LinkedList *ls) {
 it return the result of merge (that is a) otherwise return NULL,
 you can pass null safely to this function */
 
-LinkedList * linkedlist_merge(LinkedList *a, LinkedList **b) {
+STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
 	Node *n;
 
@@ -202,23 +214,23 @@ LinkedList * linkedlist_merge(LinkedList *a, LinkedList **b) {
 	/* remember the tail isn't count as part of length */
 	a->length += (*b)->length;
 
-	/* free the container structure LinkedList (not the nodes) */
+	/* free the container structure STRUCT (not the nodes) */
 	free(*b); *b = NULL;
 	return a;
 }
 
 #if 0
 /* linear search, return the content of the first element in case of success, otherwise NULL */
-Node * find(const LinkedList *ls, bool (*eq)(void*,void*), const void *e);
+Node * find(const STRUCT *ls, bool (*eq)(void*,void*), const void *e);
 
-void * linkedlist_removeAfterNode(LinkedList *ls, Node *a);
-void * linkedlist_removeBeforeNode(LinkedList *ls, Node *a);
+void * linkedlist_removeAfterNode(STRUCT *ls, Node *a);
+void * linkedlist_removeBeforeNode(STRUCT *ls, Node *a);
 void * linkedlist_replaceNodeContent(Node *n, const void *e);
-Node * linkedlist_insertAfterNode(LinkedList *ls, Node *a, const void *e);
-Node * linkedlist_insertBeforeNode(LinkedList *ls, Node *a, const void *e);
+Node * linkedlist_insertAfterNode(STRUCT *ls, Node *a, const void *e);
+Node * linkedlist_insertBeforeNode(STRUCT *ls, Node *a, const void *e);
 
-Node * linkedlist_pushBack(LinkedList *ls, const void *e);
-Node * linkedlist_pushFront(LinkedList *ls, const void *e);;
+Node * linkedlist_pushBack(STRUCT *ls, const void *e);
+Node * linkedlist_pushFront(STRUCT *ls, const void *e);;
 #endif
 
 #if 0
@@ -233,7 +245,7 @@ static void * node_removeBetween(Node *a, Node *b) {
 }
 
 /* linear search, return the content of the first element in case of success, otherwise NULL */
-Node * find(const LinkedList *ls, bool (*eq)(void*,void*), const void *e) {
+Node * find(const STRUCT *ls, bool (*eq)(void*,void*), const void *e) {
 
 	for (Node *p = ls->head; p; p = p->next)
 		if (eq(p->data, (void *)e))
@@ -241,7 +253,7 @@ Node * find(const LinkedList *ls, bool (*eq)(void*,void*), const void *e) {
 	return NULL;
 }
 
-void * linkedlist_removeAfterNode(LinkedList *ls, Node *a) {
+void * linkedlist_removeAfterNode(STRUCT *ls, Node *a) {
 
 	if (!a->next || !a->next->next) 
 		return NULL;
@@ -250,7 +262,7 @@ void * linkedlist_removeAfterNode(LinkedList *ls, Node *a) {
 	return node_removeBetween(a, a->next->next);
 }
 
-void * linkedlist_removeBeforeNode(LinkedList *ls, Node *a) {
+void * linkedlist_removeBeforeNode(STRUCT *ls, Node *a) {
 
 	if (!a->prev)
 	       	return NULL;
@@ -264,7 +276,7 @@ void * linkedlist_replaceNodeContent(Node *n, const void *e) {
 	return (n->data = (void *)e), ret;
 }
 
-Node * linkedlist_insertAfterNode(LinkedList *ls, Node *a, const void *e) {
+Node * linkedlist_insertAfterNode(STRUCT *ls, Node *a, const void *e) {
 
 	Node *n;
 	if (!a->next)
@@ -280,7 +292,7 @@ Node * linkedlist_insertAfterNode(LinkedList *ls, Node *a, const void *e) {
 	return n;
 }
 
-Node * linkedlist_insertBeforeNode(LinkedList *ls, Node *a, const void *e) { 
+Node * linkedlist_insertBeforeNode(STRUCT *ls, Node *a, const void *e) { 
 
 	Node *n;
 	if (!a->prev)
@@ -296,7 +308,7 @@ Node * linkedlist_insertBeforeNode(LinkedList *ls, Node *a, const void *e) {
 	return n;
 }
 
-Node * linkedlist_pushBack(LinkedList *ls, const void *e) {
+Node * linkedlist_pushBack(STRUCT *ls, const void *e) {
 
 	Node *next, *ret = ls->tail;
 
@@ -315,7 +327,7 @@ Node * linkedlist_pushBack(LinkedList *ls, const void *e) {
 	return ret;
 }
 
-Node * linkedlist_pushFront(LinkedList *ls, const void *e) {
+Node * linkedlist_pushFront(STRUCT *ls, const void *e) {
 
 	Node *prev;
 

@@ -1,15 +1,23 @@
 #include "vector_char.h"
+#include "vector_int.h"
+
 #include <stdio.h>
 
 int main() {
 
-	Vector *v = vector_char_new();
+	vector_char *vchar = vector_char_new();
+	vector_int  *vint  = vector_int_new();
 
 	for (char i = 'a'; i < 'z'; i++) {
-		vector_char_pushBack(v, i);
-		printf("%c added\n", vector_char_back(v));
+
+		vector_char_pushBack(vchar, i);
+		vector_int_pushBack(vint, i);
+
+		printf("%c added\n", vector_char_back(vchar));
+		printf("%d added\n", vector_int_back(vint));
 	}
 
-	vector_char_free(v);
+	vector_char_free(vchar);
+	vector_int_free(vint);
 	return 0;
 }

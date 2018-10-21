@@ -1,4 +1,5 @@
 #include "binary_heap_int.h"
+#include "binary_heap_char.h"
 
 // change the < for different heap type
 // #define MAX_HEAP
@@ -18,17 +19,21 @@ int main() {
 
 	srand(time(0));
 
-	Heap *hp = heap_int_new(lt);
+	binary_heap_int *hp = binary_heap_int_new(lt);
+
+	binary_heap_char *hpc = binary_heap_char_new(NULL); // TODO
+
 	assert(hp);
 
 	for (int i = 0; i < 100; i++)
-		heap_int_add(hp, rand());
+		binary_heap_int_add(hp, rand());
 
-	printf("length: %d\n", heap_int_length(hp));
+	printf("length: %d\n", binary_heap_int_length(hp));
 
-	while (!heap_int_isEmpty(hp))
-		printf("%d\n", heap_int_remove(hp));
+	while (!binary_heap_int_isEmpty(hp))
+		printf("%d\n", binary_heap_int_remove(hp));
 
-	heap_int_free(hp);
+	binary_heap_int_free(hp);
+	binary_heap_char_free(hpc); // TODO
 	return 0;
 }

@@ -1,3 +1,3 @@
-#include "vector_char.h"
+#include "vector_int.h"
 #include "../../generics/gvector/gvector.c"
 #include "gvector_extension.c"
