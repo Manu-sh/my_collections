@@ -1,5 +1,5 @@
 #undef CLASSNAME
-#define CLASSNAME dlinked_list_dequeue
+#define CLASSNAME gdlist_dequeue
 #include "../ccommon.h"
 
 STRUCT * _(new());

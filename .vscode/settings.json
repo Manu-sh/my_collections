@@ -24,6 +24,8 @@
 		"vector": "c",
 		"string_view": "c",
 		"dlinked_list_dequeue_char.h": "c",
-		"gdlinked_list_dequeue.h": "c"
+		"gdlinked_list_dequeue.h": "c",
+		"gdlist_dequeue.h": "c",
+		"gdlist_dequeue_char.h": "c"
 	}
 }

@@ -1,4 +1,4 @@
-/* used only by ccommon.c */
+/* the following define is used only by ccommon.c */
 #define CCOMMON_H
 
 /* CLASSNAME & TYPENAME MUST BE DEFINED BEFORE INCLUDING THIS HDR
