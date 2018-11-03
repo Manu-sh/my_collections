@@ -1,4 +1,4 @@
-#include "../ccommon.h"
+#include "../ccommon.c"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -10,25 +10,25 @@ typedef struct node {
 	TYPENAME data;
 } Node;
 
-typedef struct STRUCT {
+struct STRUCT {
 	Node *head; /* point to a preallocated block without data */
 	Node *tail;
 	Node *front;
 	int length; /* for obvious reasons the tail isn't count as part of length */
-} STRUCT;
+};
 
 /* in the worst case back point to head and that coincide with tail 
 (the pre-allocated block) (ls->back == ls->head == ls->tail)
 so a->front it's a valid blk */
 
-// TODO test
-TYPENAME  _(top)(STRUCT *ls)  { return ls->front->data; }
-TYPENAME  _(back)(STRUCT *ls)   { return ls->tail->data;  } /* there is always at least 1 blk */ 
-int       _(length)(STRUCT *ls) { return ls->length;      }
-bool   _(isEmpty)(STRUCT *ls)   { return !ls->head->next; }
-int    _(maxSize)()             { return INT_MAX;         }
+/* TODO test */
+__always_inline TYPENAME _(top)(const STRUCT *ls)     { return ls->front->data; }
+__always_inline TYPENAME _(back)(const STRUCT *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
+__always_inline int      _(length)(const STRUCT *ls)  { return ls->length;      }
+__always_inline bool     _(isEmpty)(const STRUCT *ls) { return !ls->head->next; }
+__always_inline int      _(maxSize)()                 { return INT_MAX;         }
 
-STRUCT * _(new)() {
+__always_inline STRUCT * _(new)() {
 
         STRUCT *ls;
         if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
@@ -46,11 +46,11 @@ STRUCT * _(new)() {
         return ls;
 }
 
-void _(free)(STRUCT *ls) {
+__always_inline void _(free)(STRUCT *ls) {
 
+        Node *next;
         if (!ls) return;
 
-	Node *next;
 	while ((next = ls->head->next)) {
                 free(ls->head);
 		ls->head = next;
@@ -59,7 +59,7 @@ void _(free)(STRUCT *ls) {
 	free(ls->head), free(ls);
 }
 
-bool _(push)(STRUCT *ls, const TYPENAME e) {
+__always_inline bool _(push)(STRUCT *ls, const TYPENAME e) {
 
         Node *blk;
 
@@ -80,12 +80,15 @@ bool _(push)(STRUCT *ls, const TYPENAME e) {
 }
 
 
-TYPENAME  _(pop)(STRUCT *ls) {
+__always_inline TYPENAME _(pop)(STRUCT *ls) {
+
+        TYPENAME ret;
+        Node *tofree;
 
 	/* there is always at least one block */
 	assert(!_(isEmpty)(ls));
-        TYPENAME ret = ls->head->next->data;
-        Node *tofree = ls->head;
+        ret = ls->head->next->data;
+        tofree = ls->head;
 
         ls->head     = ls->head->next;
 	ls->front    = ls->head->next;
@@ -102,8 +105,8 @@ TYPENAME  _(pop)(STRUCT *ls) {
 it return the result of merge (that is a) otherwise return NULL,
 you can pass null safely to this function */
 
-// TODO test
-STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
+/* TODO test */
+__always_inline STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
 	Node *n;
 

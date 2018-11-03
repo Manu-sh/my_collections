@@ -11,7 +11,8 @@ int main() {
 
 	vector_void_ptr  *vptr  = vector_void_ptr_new();
 
-	for (char i = 'a'; i < 'z'; i++) {
+	char i;
+	for (i = 'a'; i < 'z'; i++) {
 
 		vector_char_pushBack(vchar, i);
 		vector_int_pushBack(vint, i);

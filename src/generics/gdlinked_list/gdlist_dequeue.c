@@ -5,8 +5,6 @@
 #include <stdlib.h>
 #include <assert.h>
 
-/* TODO provide an iterator C++ style for support an easy insertion */
-
 typedef struct node {
 	struct node *next;
 	struct node *prev;
@@ -16,6 +14,7 @@ typedef struct node {
 struct STRUCT {
 	Node *head;
 	Node *tail; /* point to a preallocated block without data */
+	int length; /* for obvious reasons the tail isn't count as part of length */
 };
 
 /* b should be an empty node only data field should contain non-null value */
@@ -43,6 +42,8 @@ struct STRUCT {
 		_ANODE_->next = _CNODE_;              \
 	} while(0)                                    \
 
+
+__always_inline int _(maxSize)() { return INT_MAX-1; }
 
 __always_inline STRUCT * _(new()) {
 
@@ -74,81 +75,61 @@ __always_inline void _(free)(STRUCT *ls) {
 	free(p), free(ls);
 }
 
+__always_inline int  _(length)(const STRUCT *ls) { 
+	return ls->length;
+}
+
 __always_inline bool _(isEmpty)(const STRUCT *ls) { 
+	/* return ls->length == 0; */
 	return !ls->head->next; /* if there isn't another preallocated blk head point to tail and is itself the preallocated block */
 }
 
-__always_inline Node * _(front)(const STRUCT *ls) { 
-	return ls->head;  /* there is always at least 1 blk */
+__always_inline TYPENAME _(front)(const STRUCT *ls) { 
+	return ls->head->data;  /* there is always at least 1 blk */
 }
 
-__always_inline  Node * _(back)(const STRUCT *ls) {
-	return ls->tail->prev;
+__always_inline TYPENAME _(back)(const STRUCT *ls) { 
+#if 0
+	return linkedlist_isEmpty(ls) ? NULL : ls->tail->prev->data;  /* prev could be NULL */
+#endif
+
+	assert(!_(isEmpty)(ls));
+	return ls->tail->prev->data;
 }
 
-__always_inline  Node * _(pushBack)(STRUCT *ls, const TYPENAME e) {
+__always_inline bool _(pushBack)(STRUCT *ls, const TYPENAME e) {
 
-	Node *ret, *next;
+	Node *next;
 
 	/* pre-allocation */
 	if (!(next = (Node *)calloc(1, sizeof(Node))))
-		return NULL;
+		return false;
 
 	/* save into a previous preallocated block */
 	ls->tail->data = (TYPENAME)e;
-	ret = ls->tail;
-
 	NODE_PUSH_BACK(ls->tail, next);
 
 	/* tail must point to a preallocated block without data */
 	ls->tail = next;
-	return ret;
+
+	++ls->length;
+	return true;
 }
 
-__always_inline Node * _(insertAfterNode)(STRUCT *ls, Node *a, const TYPENAME e) {
-
-	Node *n;
-
-	assert(a);
-	if (!a->next) return linkedlist_pushBack(ls, e); /* there ins't another node, it's a simple pushBack */
-
-	if (!(n = (Node *)calloc(1, sizeof(Node))))
-		return NULL;
-
-	NODE_INSERT_BETWEEN(a, a->next, n);
-	n->data = (TYPENAME)e;
-	return n;
-}
-
-__always_inline Node * _(pushFront)(STRUCT *ls, const TYPENAME e) {
+__always_inline bool _(pushFront)(STRUCT *ls, const TYPENAME e) {
 
 	Node *prev;
 
 	if (!(prev = (Node *)calloc(1, sizeof(Node))))
-		return NULL;
+		return false;
 
 	prev->data = (TYPENAME)e;
 	NODE_PUSH_FRONT(ls->head, prev);
+	ls->head = prev;
 
-	return (ls->head = prev);
+	++ls->length;
+	return true;
 }
-
-
-__always_inline Node * _(insertBeforeNode)(STRUCT *ls, Node *a, const TYPENAME e) { 
-
-	Node *n;
-	assert(a);
-
-	if (!a->prev) return linkedlist_pushFront(ls, e); /* there ins't another node it's a simple pushFront */
-
-	if (!(n = (Node *)calloc(1, sizeof(Node))))
-		return NULL;
-
-	NODE_INSERT_BETWEEN(a->prev, a, n);
-	n->data = (void *)e;
-	return n;
-}
-
 
 __always_inline TYPENAME _(popBack)(STRUCT *ls) {
 
@@ -167,28 +148,12 @@ __always_inline TYPENAME _(popBack)(STRUCT *ls) {
 	/* ls->tail->prev->data = NULL; */
 
 	/* tail must point to a preallocated block */
-	ls->tail = ls->tail->prev;
+	ls->tail             = ls->tail->prev;
 	free(tofree);
 
+	--ls->length;
 	return ret;
 }
-
-/* remove the node between two nodes a and b and return is value */
-__helper TYPENAME node_removeBetween(Node *a, Node *b) {
-	Node *tofree = a->next;
-	TYPENAME ret = tofree->data;
-	a->next = b;
-	b->prev = a;
-	free(tofree);
-	return ret;
-}
-
-__always_inline TYPENAME linkedlist_removeAfterNode(STRUCT *ls, Node *a) {
-	assert(a);
-	assert(a->next && a->next->next);
-	return node_removeBetween(a, a->next->next);
-}
-
 
 __always_inline TYPENAME _(popFront)(STRUCT *ls) {
 
@@ -206,18 +171,40 @@ __always_inline TYPENAME _(popFront)(STRUCT *ls) {
 	ls->head       = ls->head->next;
 	ls->head->prev = NULL;
 	free(tofree);
+
+	--ls->length;
 	return ret;
 }
 
-__always_inline TYPENAME _(removeBeforeNode)(STRUCT *ls, Node *a) {
-	assert(a);
-	assert(a->prev);
-	return a->prev->prev ? node_removeBetween(a->prev->prev, a) : node_removeBetween(a->prev, a->next);
-}
 
-__always_inline TYPENAME linkedlist_replaceNodeContent(Node *n, TYPENAME e) {
-	TYPENAME ret;
-	assert(n);
-	ret = n->data;
-	return (n->data = (void *)e), ret;
+/* merge b to a, in case of success b pointer is set to NULL and
+it return the result of merge (that is a) otherwise return NULL,
+you can pass null safely to this function */
+
+__always_inline STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
+
+	Node *n;
+
+	if (!a || !b || !*b)
+		return NULL;
+
+	/* in the worst case tail point to head (that is the pre-allocated block) */
+	n = a->tail;
+
+	/* remove tail (the preallocated block) */
+	if (a->length) {
+		n = a->tail->prev;
+		free(a->tail);
+	}
+
+	/* merge */
+	NODE_PUSH_BACK(n, (*b)->head);
+	a->tail = (*b)->tail;
+
+	/* remember the tail isn't count as part of length */
+	a->length += (*b)->length;
+
+	/* free the container structure STRUCT (not the nodes) */
+	free(*b); *b = NULL;
+	return a;
 }

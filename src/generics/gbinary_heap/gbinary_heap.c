@@ -1,4 +1,4 @@
-#include "../ccommon.h"
+#include "../ccommon.c"
 
 #include <limits.h>
 #include <stdbool.h>
@@ -13,12 +13,13 @@
 	the root is v[1], v[0] is empty
 */
 
-typedef struct STRUCT {
+struct STRUCT {
 	TYPENAME *v;
 	bool (*lt)(TYPENAME,TYPENAME);
 	int idx;
 	int capacity;
-} STRUCT;
+};
+
 
 __helper void fixUp(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int k) {
 
@@ -34,7 +35,7 @@ __helper void fixDown(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to)
 	for (int j; (j = p << 1) <= to; p = j) {
 
 		/* get max or min depending of lt() behavior */
-		// j = j < to && lt(v[j], v[j+1]) ? j+1 : j;
+		/* j = j < to && lt(v[j], v[j+1]) ? j+1 : j; */
 		if (j < to && lt(v[j], v[j+1])) ++j;
 
 		if (lt(v[p], v[j]))
@@ -55,7 +56,7 @@ __helper void fixDown(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to)
 		p = j;
 	}
 
-	// TODO work well but is ugly
+	/* TODO work well but is ugly */
 	if (p <= to && p != j && lt(v[p], v[j]))
 		SWAP(TYPENAME, v[p], v[j]);
 #endif

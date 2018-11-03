@@ -1,13 +1,13 @@
-#undef CLASSNAME
+#undef  CLASSNAME
 #define CLASSNAME fifo
-#include "../hcommon.h"
+#include "../ccommon.h"
 
 STRUCT * _(new)();
 void     _(free)(STRUCT *ls);
-TYPENAME _(back)(STRUCT *ls);
-TYPENAME _(top)(STRUCT *ls);
-int      _(length)(STRUCT *ls);
-bool     _(isEmpty)(STRUCT *ls);
+TYPENAME _(back)(const STRUCT *ls);
+TYPENAME _(top)(const STRUCT *ls);
+int      _(length)(const STRUCT *ls);
+bool     _(isEmpty)(const STRUCT *ls);
 int      _(maxSize)();
 
 bool     _(push)(STRUCT *ls, const TYPENAME e);

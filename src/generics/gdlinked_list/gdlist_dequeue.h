@@ -1,6 +1,6 @@
 #undef CLASSNAME
-#define CLASSNAME dlinked_list
-#include "../hcommon.h"
+#define CLASSNAME gdlist_dequeue
+#include "../ccommon.h"
 
 STRUCT * _(new());
 void _(free)(STRUCT *ls);
@@ -8,11 +8,11 @@ void _(free)(STRUCT *ls);
 bool _(pushBack)(STRUCT *ls, const TYPENAME e);
 bool _(pushFront)(STRUCT *ls, const TYPENAME e);
 
-int  _(length)(STRUCT *ls);
-bool _(isEmpty)(STRUCT *ls);
+int  _(length)(const STRUCT *ls);
+bool _(isEmpty)(const STRUCT *ls);
 
-TYPENAME _(front)(STRUCT *ls);
-TYPENAME _(back)(STRUCT *ls);
+TYPENAME _(front)(const STRUCT *ls);
+TYPENAME _(back)(const STRUCT *ls);
 
 TYPENAME _(popBack)(STRUCT *ls);
 TYPENAME _(popFront)(STRUCT *ls);
