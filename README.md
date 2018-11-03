@@ -1,4 +1,4 @@
-# data_structures
+# my_data_structures
 A collection of data structures that should be refactored
 
 
