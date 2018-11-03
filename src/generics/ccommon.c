@@ -5,7 +5,11 @@
 	#include "ccommon.h"
 #endif
 
-#define __always_inline __attribute__((always_inline)) inline
+/* just hope that is a real inline */
+#ifndef __always_inline
+	#define __always_inline __attribute__((always_inline)) inline
+#endif
+
 #define __helper static __always_inline
 
 #define SWAP(_TYPENAME_,A,B)          \
