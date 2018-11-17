@@ -77,6 +77,26 @@ __always_inline bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
 	return true;
 }
 
+bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
+
+	const TYPENAME *end = v+len;
+
+	if (vct->idx+len >= vct->capacity) {
+
+		TYPENAME *nv = (TYPENAME *)realloc(vct->v, (vct->capacity+len) * sizeof(TYPENAME ));
+		if (!nv) return false;
+
+		vct->v = nv;
+		vct->capacity += len;
+	}
+
+	
+	for (; v != end; ++v)
+		vct->v[vct->idx++] = *((TYPENAME *)v); /* necessary cast for pointers */
+
+	return true;
+}
+
 /* it dosn't check if heap is empty so you MUST check it calling vector_isEmpty() */
 __always_inline TYPENAME _(popBack)(STRUCT *vct) {
 

@@ -15,6 +15,7 @@ int    _(capacity)(STRUCT *vct);
 bool   _(shrinkToFit)(STRUCT *vct);
 TYPENAME * _(data)(const STRUCT *vct);
 
+bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len);
 bool _(pushBack)(STRUCT *vct, const TYPENAME e);
 
 /* it dosn't check if heap is empty so you MUST check it calling vector_char_isEmpty() */
