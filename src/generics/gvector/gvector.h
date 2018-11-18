@@ -18,7 +18,7 @@ TYPENAME * _(data)(const STRUCT *vct);
 bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len);
 bool _(pushBack)(STRUCT *vct, const TYPENAME e);
 
-/* it dosn't check if heap is empty so you MUST check it calling vector_char_isEmpty() */
+/* it dosn't check if vector is empty so you MUST check it calling vector_char_isEmpty() */
 TYPENAME  _(popBack)(STRUCT *vct);
 
 /* vector random access */

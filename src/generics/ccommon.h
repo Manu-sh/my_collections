@@ -16,8 +16,6 @@
 #endif
 
 #define UNDERSCORE _
-#define EMPTY_DEF
-
 #define TOKENPASTE(_A_, _B_, _C_) _A_ ## _B_ ## _C_
 #define TKPASTE(_A_, _B_, _C_) TOKENPASTE(_A_, _B_, _C_)
 

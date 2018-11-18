@@ -26,6 +26,7 @@
 		"dlinked_list_dequeue_char.h": "c",
 		"gdlinked_list_dequeue.h": "c",
 		"gdlist_dequeue.h": "c",
-		"gdlist_dequeue_char.h": "c"
+		"gdlist_dequeue_char.h": "c",
+		"priority_queue_char.h": "c"
 	}
 }
