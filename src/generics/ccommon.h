@@ -15,6 +15,7 @@
 	#error "you must define CLASSNAME & TYPENAME & TYPEID"
 #endif
 
+#define EMPTY
 #define UNDERSCORE _
 #define TOKENPASTE(_A_, _B_, _C_) _A_ ## _B_ ## _C_
 #define TKPASTE(_A_, _B_, _C_) TOKENPASTE(_A_, _B_, _C_)
