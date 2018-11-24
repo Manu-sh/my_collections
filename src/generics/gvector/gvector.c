@@ -97,7 +97,7 @@ bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
 	return true;
 }
 
-/* it dosn't check if heap is empty so you MUST check it calling vector_isEmpty() */
+/* it dosn't check if vector is empty so you MUST check it calling vector_isEmpty() */
 __always_inline TYPENAME _(popBack)(STRUCT *vct) {
 
 	TYPENAME ret = vct->v[--vct->idx];

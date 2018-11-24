@@ -3,4 +3,4 @@
 
 #define TYPEID char
 #define TYPENAME char
-#include "../../generics/gbinary_heap/gbinary_heap.h"
+#include "../../generics/gdlinked_list/gdequeue.h"

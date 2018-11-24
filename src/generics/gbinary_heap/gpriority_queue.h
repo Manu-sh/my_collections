@@ -1,5 +1,5 @@
 #undef  CLASSNAME
-#define CLASSNAME binary_heap
+#define CLASSNAME priority_queue
 
 #include "../ccommon.h"
 

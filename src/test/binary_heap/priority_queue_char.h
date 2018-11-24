@@ -3,4 +3,4 @@
 
 #define TYPEID char
 #define TYPENAME char
-#include "../../generics/gdlinked_list/gdlist_dequeue.h"
+#include "../../generics/gbinary_heap/gpriority_queue.h"
