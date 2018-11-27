@@ -77,7 +77,7 @@ __always_inline bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
 	return true;
 }
 
-bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
+__always_inline bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
 
 	const TYPENAME *end = v+len;
 
