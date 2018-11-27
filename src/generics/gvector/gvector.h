@@ -15,6 +15,7 @@ int    _(capacity)(STRUCT *vct);
 bool   _(shrinkToFit)(STRUCT *vct);
 TYPENAME * _(data)(const STRUCT *vct);
 
+/* TODO ellipsi ? */
 bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len);
 bool _(pushBack)(STRUCT *vct, const TYPENAME e);
 
