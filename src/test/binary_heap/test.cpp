@@ -120,7 +120,7 @@ int main() {
 	AlgoRank tab;
 	using std::string_literals::operator""s;
 
-	for (auto sample_size : {100,1000,10000,100000}) {
+	for (auto sample_size : {100,1000,10000,100000,1000000}) {
 
 		const bool MAX_HEAP = true, MIN_HEAP = false;
 		const auto &sample = get_sample(sample_size);
