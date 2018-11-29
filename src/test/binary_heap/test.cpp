@@ -1,4 +1,4 @@
-#include "abench/AlgoRank.cpp"
+#include "../abench/AlgoRank.cpp"
 
 extern "C" {
 	#include <unistd.h>
@@ -27,7 +27,6 @@ vector<int> get_sample(int size) {
 
 void check_correctness(const vector<int> &sample) {
 
-	srand(time(0));
 	bool max_heap = true;
 
 jmp:
@@ -81,7 +80,6 @@ jmp:
 }
 
 void benchmark_cpp(const vector<int> &sample, bool max_heap) {
-
 
 	bool (*lt)(int,int) = max_heap ? [] (int a, int b) { return a < b; } : [] (int a, int b) { return b > a; };
 	priority_queue<int, vector<int>, decltype(lt)> pqueue(lt);
