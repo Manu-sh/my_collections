@@ -134,6 +134,7 @@ int main() {
 			"c min_heap   ("s + ssample_size + ")"s
 		};
 
+		/* tab take his own copy of .c_str() so there aren't problems when vector will be destroyed */
 		tab.bench( v[0].c_str(), [&sample, MAX_HEAP] { benchmark_cpp(sample, MAX_HEAP); });
 		tab.bench( v[1].c_str(), [&sample, MIN_HEAP] { benchmark_cpp(sample, MIN_HEAP); });
 		tab.bench( v[2].c_str(), [&sample, MAX_HEAP] { benchmark_c(sample, MAX_HEAP); });
