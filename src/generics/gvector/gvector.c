@@ -10,12 +10,14 @@ struct STRUCT {
 	int capacity;
 };
 
+// #define ALIGN16(_X_) (((_X_)+(16)) & ~0x0f)
+
 __always_inline TYPENAME * _(data)(const STRUCT *vct) { return vct->v; }
 __always_inline bool _(isEmpty)(const STRUCT *vct) { return vct->idx == 0; }
 __always_inline int  _(length)(const STRUCT *vct)  { return vct->idx; }
 __always_inline int  _(maxSize)() { return INT_MAX; }
 __always_inline void _(clear)(STRUCT *vct) { vct->idx = 0; }
-__always_inline int  _(capacity)(STRUCT *vct) { return vct->capacity; }
+__always_inline int  _(capacity)(const STRUCT *vct) { return vct->capacity; }
 
 /* vector random access */
 __always_inline TYPENAME _(access)(const STRUCT *vct, int at) { return vct->v[at]; }

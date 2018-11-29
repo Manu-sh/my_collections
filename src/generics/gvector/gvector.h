@@ -11,7 +11,7 @@ int    _(length)(const STRUCT *vct);
 int    _(maxSize)();
 void   _(clear)(STRUCT *vct);
 bool   _(resize)(STRUCT *vct, int len);
-int    _(capacity)(STRUCT *vct);
+int    _(capacity)(const STRUCT *vct);
 bool   _(shrinkToFit)(STRUCT *vct);
 TYPENAME * _(data)(const STRUCT *vct);
 

@@ -2,7 +2,7 @@
 
 extern "C" {
 	#include <unistd.h>
-	#include "priority_queue_int.h"
+	#include "priority_queue_int.h"  /* include priority_queue_int.c directly to allow function inlining */
 }
 
 #include <cstdio>

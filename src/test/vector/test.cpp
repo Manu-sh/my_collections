@@ -2,7 +2,7 @@
 
 extern "C" {
 	#include <unistd.h>
-	#include "vector_int.h"
+	#include "vector_int.h" /* include vector_int.c directly to allow function inlining */
 }
 
 #include <cstdio>
@@ -71,7 +71,7 @@ void benchmark_cpp(const vector<int> &sample) {
 		pvct.back();
 	}
 
-	// cout << "pvct: " << pvct.capacity() << endl;
+	cout << "pvct: " << pvct.capacity() << endl;
 
 	while (!pvct.empty()) {
 		pvct.back();
@@ -89,7 +89,7 @@ void benchmark_c(const vector<int> &sample) {
 		vector_int_back(vct);
 	}
 
-	// cout << "vct: " << vector_int_capacity(vct) << endl;
+	cout << "vct: " << vector_int_capacity(vct) << endl;
 
 	while (!vector_int_isEmpty(vct)) {
 		vector_int_back(vct);
