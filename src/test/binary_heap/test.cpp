@@ -76,6 +76,8 @@ jmp:
 		goto jmp;
 	}
 
+	// printf("capacity: %d\n", priority_queue_int_capacity(hp));
+
 }
 
 void benchmark_cpp(const vector<int> &sample, bool max_heap) {

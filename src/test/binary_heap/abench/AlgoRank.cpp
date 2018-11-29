@@ -39,6 +39,8 @@ void AlgoRank::add_bench(const char *fname, std::function<double()> f) {
 
 std::ostream & operator<<(std::ostream &os, AlgoRank &o) {
 
+	// TODO define an overload: https://stackoverflow.com/questions/18074799/is-stdgreaterdouble-and-stdlessdouble-safe-to-use
+
 	static std::multimap<double, std::string, std::less<double>> results;
 
 	if (o.changed) {
