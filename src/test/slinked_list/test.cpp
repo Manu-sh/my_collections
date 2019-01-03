@@ -1,7 +1,9 @@
-#include "fifo_int.h"
-#include "lifo_int.h"
+extern "C" {
+	#include "fifo_int.h"
+	#include "lifo_int.h"
+}
 
-#include <stdio.h>
+#include <cstdio>
 
 int main() {
 

@@ -13,7 +13,7 @@ typedef struct node {
 struct STRUCT {
 	Node *head; /* point to a preallocated block without data */
 	Node *tail;
-	Node *front;
+	/* Node *front; front => head.next */
 	int length; /* for obvious reasons the tail isn't count as part of length */
 };
 
@@ -22,7 +22,7 @@ struct STRUCT {
 so a->front it's a valid blk */
 
 /* TODO test */
-__always_inline TYPENAME _(top)(const STRUCT *ls)     { return ls->front->data; }
+__always_inline TYPENAME _(top)(const STRUCT *ls)     { return ls->head->next->data; }
 __always_inline TYPENAME _(back)(const STRUCT *ls)    { return ls->tail->data;  } /* there is always at least 1 blk */ 
 __always_inline int      _(length)(const STRUCT *ls)  { return ls->length;      }
 __always_inline bool     _(isEmpty)(const STRUCT *ls) { return !ls->head->next; }
@@ -41,8 +41,6 @@ __always_inline STRUCT * _(new)() {
         }
 
 	ls->tail  = ls->head;
-	ls->front = ls->head;
-
         return ls;
 }
 
@@ -72,7 +70,6 @@ __always_inline bool _(push)(STRUCT *ls, const TYPENAME e) {
 
         /* head must point to a preallocated block without data */
 	blk->next = ls->head;
-	ls->front = ls->head;
         ls->head  = blk;
 
         ++ls->length;
@@ -91,7 +88,6 @@ __always_inline TYPENAME _(pop)(STRUCT *ls) {
         tofree = ls->head;
 
         ls->head     = ls->head->next;
-	ls->front    = ls->head->next;
         free(tofree);
 
         --ls->length;
@@ -123,7 +119,6 @@ __always_inline STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 	(*b)->tail->next = n;
 	a->head    = (*b)->head;
 	a->tail    = (*b)->tail;
-	a->front   = (*b)->front;
 
         /* remember the tail isn't count as part of length */
         a->length += (*b)->length;

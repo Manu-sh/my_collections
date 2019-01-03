@@ -29,6 +29,9 @@
 		"gdlist_dequeue_char.h": "c",
 		"priority_queue_char.h": "c",
 		"dequeue_char.h": "c",
-		"gdequeue.h": "c"
+		"gdequeue.h": "c",
+		"lifo_int.h": "c",
+		"stdbool.h": "c",
+		"glifo.h": "c"
 	}
 }
