@@ -68,13 +68,13 @@ void benchmark_cpp(const vector<int> &sample) {
 
 	for (auto s : sample) {
 		pvct.push_back(s);
-		pvct.back();
+		(void)pvct.back();
 	}
 
-	cout << "pvct: " << pvct.capacity() << endl;
+	cout << "pvct: " << pvct.capacity() << '\n';
 
 	while (!pvct.empty()) {
-		pvct.back();
+		(void)pvct.back();
 		pvct.pop_back();
 	}
 
@@ -85,15 +85,15 @@ void benchmark_c(const vector<int> &sample) {
 	vector_int *vct = vector_int_new();
 
 	for (auto s : sample) {
-		vector_int_pushBack(vct, s);
-		vector_int_back(vct);
+		(void)vector_int_pushBack(vct, s);
+		(void)vector_int_back(vct);
 	}
 
-	cout << "vct: " << vector_int_capacity(vct) << endl;
+	cout << "vct: " << vector_int_capacity(vct) << '\n';
 
 	while (!vector_int_isEmpty(vct)) {
-		vector_int_back(vct);
-		vector_int_popBack(vct);
+		(void)vector_int_back(vct);
+		(void)vector_int_popBack(vct);
 	}
 
 	vector_int_free(vct);
