@@ -65,14 +65,14 @@ __helper void fixDown(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to)
 
 
 /* INT_MAX-1 because heap start at 1 */
-__always_inline	int _(maxSize)() {
+FORCED(inline)	int _(maxSize)() {
 	return INT_MAX-1;
 }
 
 /* provide a less_than() or greater_then() function 
 respectively if you want max_heap or min_heap */
 
-__always_inline STRUCT * _(new)(bool (*lt)(TYPENAME,TYPENAME)) {
+FORCED(inline) STRUCT * _(new)(bool (*lt)(TYPENAME,TYPENAME)) {
 
 	STRUCT *hp;
 
@@ -91,31 +91,31 @@ __always_inline STRUCT * _(new)(bool (*lt)(TYPENAME,TYPENAME)) {
 }
 
 
-__always_inline void _(free)(STRUCT *hp) { 
+FORCED(inline) void _(free)(STRUCT *hp) {
 	if (!hp) return; 
 	free(hp->v); free(hp); 
 }
 
 
-__always_inline bool _(isEmpty)(const STRUCT *hp) { 
+FORCED(inline) bool _(isEmpty)(const STRUCT *hp) {
 	return hp->idx == 0; 
 }
 
 
 /* retrieve but not remove the root */
-__always_inline TYPENAME  _(peek)(const STRUCT *hp) { 
+FORCED(inline) TYPENAME  _(peek)(const STRUCT *hp) {
 	assert(!_(isEmpty)(hp));
 	return hp->v[1]; 
 }
 
 
 /* number of elements that heap contains */
-__always_inline int _(length)(const STRUCT *hp) {
+FORCED(inline) int _(length)(const STRUCT *hp) {
 	 return hp->idx;
 }
 
 
-__always_inline bool _(add)(STRUCT *hp, const TYPENAME e) {
+FORCED(inline) bool _(add)(STRUCT *hp, const TYPENAME e) {
 
 	/* doubling-halving: growUp */
 	if (hp->idx >= hp->capacity-1) {
@@ -134,7 +134,7 @@ __always_inline bool _(add)(STRUCT *hp, const TYPENAME e) {
 }
 
 /* it dosn't check if heap is empty so you MUST check it */
-__always_inline TYPENAME _(remove)(STRUCT *hp) {
+FORCED(inline) TYPENAME _(remove)(STRUCT *hp) {
 
 	TYPENAME ret;
 
@@ -161,7 +161,7 @@ return the previous root on success, NULL if an error is occurred.
 More efficient than get followed by add, since only need to balance once, 
 not twice, and appropriate for fixed-size heaps. */
 
-__always_inline TYPENAME _(replace)(STRUCT *hp, const TYPENAME e) {
+FORCED(inline) TYPENAME _(replace)(STRUCT *hp, const TYPENAME e) {
 
 	TYPENAME  ret = (TYPENAME )e;
 	assert(!_(isEmpty)(hp));

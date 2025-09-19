@@ -43,9 +43,9 @@ struct STRUCT {
 	} while(0)                                    \
 
 
-__always_inline int _(maxSize)() { return INT_MAX-1; }
+FORCED(inline) int _(maxSize)() { return INT_MAX-1; }
 
-__always_inline STRUCT * _(new()) {
+FORCED(inline) STRUCT * _(new()) {
 
 	STRUCT *ls;
 	if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
@@ -61,7 +61,7 @@ __always_inline STRUCT * _(new()) {
 	return ls;
 }
 
-__always_inline void _(free)(STRUCT *ls) {
+FORCED(inline) void _(free)(STRUCT *ls) {
 
 	Node *p;
 
@@ -75,20 +75,20 @@ __always_inline void _(free)(STRUCT *ls) {
 	free(p), free(ls);
 }
 
-__always_inline int  _(length)(const STRUCT *ls) { 
+FORCED(inline) int  _(length)(const STRUCT *ls) {
 	return ls->length;
 }
 
-__always_inline bool _(isEmpty)(const STRUCT *ls) { 
+FORCED(inline) bool _(isEmpty)(const STRUCT *ls) {
 	/* return ls->length == 0; */
 	return !ls->head->next; /* if there isn't another preallocated blk head point to tail and is itself the preallocated block */
 }
 
-__always_inline TYPENAME _(front)(const STRUCT *ls) { 
+FORCED(inline) TYPENAME _(front)(const STRUCT *ls) {
 	return ls->head->data;  /* there is always at least 1 blk */
 }
 
-__always_inline TYPENAME _(back)(const STRUCT *ls) { 
+FORCED(inline) TYPENAME _(back)(const STRUCT *ls) {
 #if 0
 	return linkedlist_isEmpty(ls) ? NULL : ls->tail->prev->data;  /* prev could be NULL */
 #endif
@@ -97,7 +97,7 @@ __always_inline TYPENAME _(back)(const STRUCT *ls) {
 	return ls->tail->prev->data;
 }
 
-__always_inline bool _(pushBack)(STRUCT *ls, const TYPENAME e) {
+FORCED(inline) bool _(pushBack)(STRUCT *ls, const TYPENAME e) {
 
 	Node *next;
 
@@ -116,7 +116,7 @@ __always_inline bool _(pushBack)(STRUCT *ls, const TYPENAME e) {
 	return true;
 }
 
-__always_inline bool _(pushFront)(STRUCT *ls, const TYPENAME e) {
+FORCED(inline) bool _(pushFront)(STRUCT *ls, const TYPENAME e) {
 
 	Node *prev;
 
@@ -131,7 +131,7 @@ __always_inline bool _(pushFront)(STRUCT *ls, const TYPENAME e) {
 	return true;
 }
 
-__always_inline TYPENAME _(popBack)(STRUCT *ls) {
+FORCED(inline) TYPENAME _(popBack)(STRUCT *ls) {
 
 	TYPENAME ret;
 	Node *tofree;
@@ -155,7 +155,7 @@ __always_inline TYPENAME _(popBack)(STRUCT *ls) {
 	return ret;
 }
 
-__always_inline TYPENAME _(popFront)(STRUCT *ls) {
+FORCED(inline) TYPENAME _(popFront)(STRUCT *ls) {
 
 	/* there is always at least one block */
 	TYPENAME ret = ls->head->data;
@@ -181,7 +181,7 @@ __always_inline TYPENAME _(popFront)(STRUCT *ls) {
 it return the result of merge (that is a) otherwise return NULL,
 you can pass null safely to this function */
 
-__always_inline STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
+FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
 	Node *n;
 

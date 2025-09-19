@@ -3,10 +3,25 @@
 #include <stdbool.h>
 
 #ifdef FORCED
-    #error "FORCED() macro already defined"
+    #warning "FORCED() macro already defined, inline may not performed"
 #endif
 
-#define FORCED(_UNUSED_) inline __attribute__((always_inline))
+
+/*
+ NOTE: to use inline you need to compile at least with c99, you can disable inline defining FORCED(_) as a macro that do nothing
+ __STDC_VERSION__ is a macro defined with c95 (199409L)
+*/
+
+#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
+    #define FORCED(_)
+#endif
+
+
+/* just hope that is a real inline */
+#ifndef FORCED
+    #define FORCED(_UNUSED_) inline __attribute__((always_inline))
+#endif
+
 
 // ceil_div(x, 8) -> same of (int)ceil(x/8.)
 static FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) {
@@ -40,14 +55,14 @@ static FORCED(inline) uint8_t take_few_bits(uint8_t byte, uint8_t bit_length) {
 
 static FORCED(inline) void assign_bit(uint8_t *v, uint64_t bit_index, bool value) {
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
-    uint8_t *bit_pack = v + byte_idx;
+    uint8_t *const bit_pack = v + byte_idx;
     value ? set_bit(bit_pack, bit_index & 7) : clear_bit(bit_pack, bit_index & 7);  // i&7 -> i%8
 }
 
 // https://github.com/Manu-sh/huffman/blob/main/include/bitarray/BitArray.hpp#L166
 static FORCED(inline) bool access_bit(const uint8_t *v, uint64_t bit_index) {
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
-    const uint8_t *bit_pack = v + byte_idx;
+    const uint8_t *const bit_pack = v + byte_idx;
     return ((*bit_pack) >> (7 - (bit_index&7))) & 1;  // i&7 -> i%8
 }
 

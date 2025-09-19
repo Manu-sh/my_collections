@@ -4,7 +4,7 @@
 #CXXFLAGS=-Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic -Werror -march=native -mtune=native -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched -flto
 
 # since std::vector function are templates and im compiling .o object the inline of cpp is unfair my function cant be inlined if i link as .o
-CXXFLAGS=-fno-inline -Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic -Werror -march=native -mtune=native -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched
+CXXFLAGS=-std=c++14 -fno-inline -Ofast -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic -Werror -march=native -mtune=native -funswitch-loops -ftree-vectorize -fivopts -fmodulo-sched
 
 #CXXFLAGS=-O0 -g -fno-inline 
 .PHONY: all clean test

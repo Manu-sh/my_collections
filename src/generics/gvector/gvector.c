@@ -12,18 +12,18 @@ struct STRUCT {
 
 // #define ALIGN16(_X_) (((_X_)+(16)) & ~0x0f)
 
-__always_inline TYPENAME * _(data)(const STRUCT *vct) { return vct->v; }
-__always_inline bool _(isEmpty)(const STRUCT *vct) { return vct->idx == 0; }
-__always_inline int  _(length)(const STRUCT *vct)  { return vct->idx; }
-__always_inline int  _(maxSize)() { return INT_MAX; }
-__always_inline void _(clear)(STRUCT *vct) { vct->idx = 0; }
-__always_inline int  _(capacity)(const STRUCT *vct) { return vct->capacity; }
+FORCED(inline) TYPENAME * _(data)(const STRUCT *vct) { return vct->v; }
+FORCED(inline) bool _(isEmpty)(const STRUCT *vct) { return vct->idx == 0; }
+FORCED(inline) int  _(length)(const STRUCT *vct)  { return vct->idx; }
+FORCED(inline) int  _(maxSize)() { return INT_MAX; }
+FORCED(inline) void _(clear)(STRUCT *vct) { vct->idx = 0; }
+FORCED(inline) int  _(capacity)(const STRUCT *vct) { return vct->capacity; }
 
 /* vector random access */
-__always_inline TYPENAME _(access)(const STRUCT *vct, int at) { return vct->v[at]; }
-__always_inline void _(assign)(STRUCT *vct, int at, const TYPENAME e) { vct->v[at] = (TYPENAME)e; }
+FORCED(inline) TYPENAME _(access)(const STRUCT *vct, int at) { return vct->v[at]; }
+FORCED(inline) void _(assign)(STRUCT *vct, int at, const TYPENAME e) { vct->v[at] = (TYPENAME)e; }
 
-__always_inline bool _(resize)(STRUCT *vct, int len) {
+FORCED(inline) bool _(resize)(STRUCT *vct, int len) {
 
 	TYPENAME *nv = (TYPENAME *)realloc(vct->v, len * sizeof(TYPENAME ));
 	if (!nv) return false;
@@ -35,14 +35,14 @@ __always_inline bool _(resize)(STRUCT *vct, int len) {
 	return true;
 }
 
-__always_inline bool _(shrinkToFit)(STRUCT *vct) {
+FORCED(inline) bool _(shrinkToFit)(STRUCT *vct) {
 	TYPENAME *nv = (TYPENAME *)realloc(vct->v, (vct->idx+1) * sizeof(TYPENAME ));
 	if (!nv) return false;
 	vct->capacity = vct->idx+1;
 	return true;
 }
 
-__always_inline STRUCT * _(new)() {
+FORCED(inline) STRUCT * _(new)() {
 
 	STRUCT *vct;
 
@@ -58,13 +58,13 @@ __always_inline STRUCT * _(new)() {
 	return vct;
 }
 
-__always_inline void _(free)(STRUCT *vct) {
+FORCED(inline) void _(free)(STRUCT *vct) {
 	if (!vct) return;
 	free(vct->v);
 	free(vct);
 }
 
-__always_inline bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
+FORCED(inline) bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
 
 	/* doubling-halving: growUp */
 	if (vct->idx >= vct->capacity-1) {
@@ -79,7 +79,7 @@ __always_inline bool _(pushBack)(STRUCT *vct, const TYPENAME e) {
 	return true;
 }
 
-__always_inline bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
+FORCED(inline) bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
 
 	const TYPENAME *end = v+len;
 
@@ -100,7 +100,7 @@ __always_inline bool _(pushBackAll)(STRUCT *vct, const TYPENAME *v, int len) {
 }
 
 /* it dosn't check if vector is empty so you MUST check it calling vector_isEmpty() */
-__always_inline TYPENAME _(popBack)(STRUCT *vct) {
+FORCED(inline) TYPENAME _(popBack)(STRUCT *vct) {
 
 	TYPENAME ret = vct->v[--vct->idx];
        
@@ -117,7 +117,7 @@ __always_inline TYPENAME _(popBack)(STRUCT *vct) {
 }
 
 /* get back the old element */
-__always_inline TYPENAME _(replace)(STRUCT *vct, int at, const TYPENAME e) {
+FORCED(inline) TYPENAME _(replace)(STRUCT *vct, int at, const TYPENAME e) {
 	TYPENAME ret = vct->v[at];
 	return (vct->v[at] = (TYPENAME)e), ret;
 }

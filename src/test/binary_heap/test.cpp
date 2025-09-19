@@ -86,11 +86,11 @@ void benchmark_cpp(const vector<int> &sample, bool max_heap) {
 
 	for (auto s : sample) {
 		pqueue.push(s);
-		pqueue.top();
+        (void)pqueue.top();
 	}
 
 	while (!pqueue.empty()) {
-		pqueue.top();
+        (void)pqueue.top();
 		pqueue.pop();
 	}
 

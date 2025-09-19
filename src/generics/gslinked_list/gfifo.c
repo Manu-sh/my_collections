@@ -21,13 +21,13 @@ struct STRUCT {
 (the pre-allocated block) (ls->back == ls->head == ls->tail)
 so a->back it's a valid blk */
 
-__always_inline int       _(maxSize)()           { return INT_MAX; }
-__always_inline TYPENAME  _(back)(const STRUCT *ls)    { return ls->back->data;  }
-__always_inline int       _(length)(const STRUCT *ls)  { return ls->length;      }
-__always_inline bool      _(isEmpty)(const STRUCT *ls) { return !ls->head->next; }
-__always_inline TYPENAME  _(top)(const STRUCT *ls)     { return ls->head->data;  } /* there is always at least 1 blk */ 
+FORCED(inline) int       _(maxSize)()           { return INT_MAX; }
+FORCED(inline) TYPENAME  _(back)(const STRUCT *ls)    { return ls->back->data;  }
+FORCED(inline) int       _(length)(const STRUCT *ls)  { return ls->length;      }
+FORCED(inline) bool      _(isEmpty)(const STRUCT *ls) { return !ls->head->next; }
+FORCED(inline) TYPENAME  _(top)(const STRUCT *ls)     { return ls->head->data;  } /* there is always at least 1 blk */
 
-__always_inline STRUCT * _(new)() {
+FORCED(inline) STRUCT * _(new)() {
 
         STRUCT *ls;
         if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
@@ -45,7 +45,7 @@ __always_inline STRUCT * _(new)() {
         return ls;
 }
 
-__always_inline void _(free)(STRUCT *ls) {
+FORCED(inline) void _(free)(STRUCT *ls) {
 
         Node *next;
 
@@ -59,7 +59,7 @@ __always_inline void _(free)(STRUCT *ls) {
 	free(ls->head), free(ls);
 }
 
-__always_inline bool _(push)(STRUCT *ls, const TYPENAME e) {
+FORCED(inline) bool _(push)(STRUCT *ls, const TYPENAME e) {
 
         Node *next;
 
@@ -80,7 +80,7 @@ __always_inline bool _(push)(STRUCT *ls, const TYPENAME e) {
 }
 
 
-__always_inline TYPENAME  _(pop)(STRUCT *ls) {
+FORCED(inline) TYPENAME  _(pop)(STRUCT *ls) {
 
 	/* there is always at least one block */
         TYPENAME ret = ls->head->data;
@@ -106,7 +106,7 @@ __always_inline TYPENAME  _(pop)(STRUCT *ls) {
 it return the result of merge (that is a) otherwise return NULL,
 you can pass null safely to this function */
 
-__always_inline STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
+FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
         if (!a || !b || !*b)
                 return NULL;

@@ -83,8 +83,7 @@ static bool vector_bit_push(vector_bit *self, bool value) {
         self->bit_capacity = new_byte_capacity * 8;
     }
 
-    vector_bit_assign(self, self->bit_idx, value);
-    self->bit_idx++;
+    vector_bit_assign(self, self->bit_idx, value), ++self->bit_idx;
     return true;
 }
 
