@@ -4,5 +4,8 @@ CFLAGS=-O0 -pipe -Wall -Wextra -Wno-unused-function -pedantic -ftrapv -fstack-pr
 all:
 	$(CC) $(CFLAGS) -o test test.c
 
+test: all
+	./test
+
 clean:
 	rm -rf test

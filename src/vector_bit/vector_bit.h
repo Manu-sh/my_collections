@@ -44,7 +44,7 @@ void vector_bit_assign(vector_bit *self, uint64_t bit_index, bool value) {
 }
 
 
-bool vector_bit_access(vector_bit *self, uint64_t bit_index) {
+bool vector_bit_access(const vector_bit *self, uint64_t bit_index) {
     return access_bit(self->v, bit_index);
 }
 
@@ -69,7 +69,7 @@ uint64_t vector_bit_capacity(const vector_bit *self) {
 }
 
 
-// return true unless fail
+// return true unless fail (TODO: this a bit tricky an error code would be a better opt)
 bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
@@ -112,11 +112,12 @@ bool vector_bit_pop(vector_bit *self) {
 
 bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 
-    uint8_t *const nv = realloc(self->v, bytes_required(bit_len));
+    const uint64_t byte_capacity = bytes_required(bit_len);
+    uint8_t *const nv = realloc(self->v, byte_capacity);
     if (!nv) return false;
 
     self->v = nv;
-    self->bit_capacity = bit_len;
+    self->bit_capacity = byte_capacity * 8;
     self->bit_idx = self->bit_idx >= bit_len ? bit_len : self->bit_idx;
 
     return true;
@@ -133,8 +134,8 @@ bool vector_bit_shrink_to_fit(vector_bit *self) {
 }
 
 
-// effective byte size of the underlining vector
-uint64_t vector_bit_byte_capacity(vector_bit *self) {
+// effective byte size of the underlining vector self->v
+uint64_t vector_bit_byte_capacity(const vector_bit *self) {
     return bytes_required(self->bit_capacity);
 }
 
@@ -145,10 +146,11 @@ uint8_t * vector_bit_data(const vector_bit *self) {
 
 
 
-#if 0
+
+#ifdef EXTRAS
 
     /* FUNCTION TO DEAL WITH UNDERLING MEMORY */
-    bool vector_bit_has_padding_bits(vector_bit *self) {
+    bool vector_bit_has_padding_bits(const vector_bit *self) {
         return self->bit_idx & 7;
     }
 
@@ -158,11 +160,12 @@ uint8_t * vector_bit_data(const vector_bit *self) {
 
 
 
+
     // how many bytes you effectively need to store the amount of bits that vector_bit actually contains
     // 0 if no bits are stored
     uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
         uint64_t tmp = vector_bit_length(self);
-        return tmp == 0 ? 0 : bytes_required(tmp)
+        return tmp == 0 ? 0 : bytes_required(tmp);
     }
 
 
@@ -192,7 +195,7 @@ uint8_t * vector_bit_data(const vector_bit *self) {
 
     // cut away the padding bits from the last byte & return the last byte
     uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
-        uint8_t back_byte_with_padding_bits = vector_bit_back_byte(self);
+        uint8_t back_byte_with_padding_bits = *vector_bit_back_byte(self);
         return vector_bit_has_padding_bits(self) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
     }
 #endif
