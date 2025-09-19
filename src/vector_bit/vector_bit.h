@@ -15,7 +15,7 @@ typedef struct {
 } vector_bit;
 
 
-vector_bit * vector_bit_new() {
+static vector_bit * vector_bit_new() {
 
     vector_bit *self;
 
@@ -32,45 +32,45 @@ vector_bit * vector_bit_new() {
 }
 
 
-void vector_bit_free(vector_bit *self) {
+static void vector_bit_free(vector_bit *self) {
     if (!self) return;
     free(self->v);
     free(self);
 }
 
 
-void vector_bit_assign(vector_bit *self, uint64_t bit_index, bool value) {
+static FORCED(inline) void vector_bit_assign(vector_bit *self, uint64_t bit_index, bool value) {
     assign_bit(self->v, bit_index, value);
 }
 
 
-bool vector_bit_access(const vector_bit *self, uint64_t bit_index) {
+static FORCED(inline) bool vector_bit_access(const vector_bit *self, uint64_t bit_index) {
     return access_bit(self->v, bit_index);
 }
 
 
-bool vector_bit_is_empty(const vector_bit *self) {
+static FORCED(inline) bool vector_bit_is_empty(const vector_bit *self) {
     return self->bit_idx == 0;
 }
 
 
-void vector_bit_clear(vector_bit *self) {
+static FORCED(inline) void vector_bit_clear(vector_bit *self) {
     self->bit_idx = 0;
 }
 
 // number of bits stored
-uint64_t vector_bit_length(const vector_bit *self) {
+static FORCED(inline) uint64_t vector_bit_length(const vector_bit *self) {
     return self->bit_idx;
 }
 
 // capacity in bits (is always at least 8)
-uint64_t vector_bit_capacity(const vector_bit *self) {
+static  FORCED(inline) uint64_t vector_bit_capacity(const vector_bit *self) {
     return self->bit_capacity;
 }
 
 
 // return true unless fail (TODO: this a bit tricky an error code would be a better opt)
-bool vector_bit_push(vector_bit *self, bool value) {
+static bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
     if (self->bit_idx >= self->bit_capacity-1) {
@@ -110,7 +110,7 @@ bool vector_bit_pop(vector_bit *self) {
 }
 
 
-bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
+static bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 
     const uint64_t byte_capacity = bytes_required(bit_len);
     uint8_t *const nv = realloc(self->v, byte_capacity);
@@ -124,7 +124,7 @@ bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 }
 
 
-bool vector_bit_shrink_to_fit(vector_bit *self) {
+static bool vector_bit_shrink_to_fit(vector_bit *self) {
 
     const uint64_t new_byte_capacity = bytes_required(self->bit_idx+1);
     uint8_t *const nv = realloc(self->v, new_byte_capacity);
@@ -135,26 +135,25 @@ bool vector_bit_shrink_to_fit(vector_bit *self) {
 
 
 // effective byte size of the underlining vector self->v
-uint64_t vector_bit_byte_capacity(const vector_bit *self) {
+static FORCED(inline) uint64_t vector_bit_byte_capacity(const vector_bit *self) {
     return bytes_required(self->bit_capacity);
 }
 
 
-uint8_t * vector_bit_data(const vector_bit *self) {
+static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     return self->v;
 }
-
 
 
 
 #ifdef EXTRAS
 
     /* FUNCTION TO DEAL WITH UNDERLING MEMORY */
-    bool vector_bit_has_padding_bits(const vector_bit *self) {
+    static FORCED(inline) bool vector_bit_has_padding_bits(const vector_bit *self) {
         return self->bit_idx & 7;
     }
 
-    uint64_t vector_bit_last_bit_idx(const vector_bit *self) {
+    static FORCED(inline) uint64_t vector_bit_last_bit_idx(const vector_bit *self) {
         return self->bit_idx - (self->bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
     }
 
@@ -163,14 +162,14 @@ uint8_t * vector_bit_data(const vector_bit *self) {
 
     // how many bytes you effectively need to store the amount of bits that vector_bit actually contains
     // 0 if no bits are stored
-    uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
+    static FORCED(inline) uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
         uint64_t tmp = vector_bit_length(self);
         return tmp == 0 ? 0 : bytes_required(tmp);
     }
 
 
     // last_element_byte_idx() -> accessing v[ last_element_byte_idx() ] is always valid
-    uint64_t vector_bit_last_element_byte_idx(const vector_bit *self) {
+    static FORCED(inline) uint64_t vector_bit_last_element_byte_idx(const vector_bit *self) {
 
         // self->bit_idx point to the next unused bit
         // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
@@ -182,19 +181,19 @@ uint8_t * vector_bit_data(const vector_bit *self) {
     // never null, return the back byte including padding bits or a block with meaningless bits
     // es. you have 14 bit stored into a v of 256 bit capacity, this function return &v[1]
     // these function are useful when you have to deal with memory to make copy with memcpy etc.
-    uint8_t * vector_bit_back_byte(const vector_bit *self) {
+    static FORCED(inline) uint8_t * vector_bit_back_byte(const vector_bit *self) {
         assert(vector_bit_length(self) > 0);
         return self->v + vector_bit_last_element_byte_idx(self);
     }
 
     // how many padding bits you have, es. i have 5 bit into self and i have 3 bit of padding (obv you cannot allocate a single bit you have to allocate a byte)
-    uint8_t vector_bit_padding_bits(const vector_bit *self) {
+    static FORCED(inline) uint8_t vector_bit_padding_bits(const vector_bit *self) {
         return vector_bit_has_padding_bits(self) ? 8 - (self->bit_idx & 7) : 0;
     }
 
 
     // cut away the padding bits from the last byte & return the last byte
-    uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
+    static FORCED(inline) uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
         uint8_t back_byte_with_padding_bits = *vector_bit_back_byte(self);
         return vector_bit_has_padding_bits(self) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
     }
@@ -202,7 +201,7 @@ uint8_t * vector_bit_data(const vector_bit *self) {
 
 #if 0
     // TODO: questa funzione va testata attentamente
-    bool vector_bit_push_all(vector_bit *self, const uint8_t *v, uint64_t bit_length) {
+    static bool vector_bit_push_all(vector_bit *self, const uint8_t *v, uint64_t bit_length) {
 
         if (bit_length == 0)
             return true;
