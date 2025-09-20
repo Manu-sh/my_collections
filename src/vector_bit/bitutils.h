@@ -1,7 +1,18 @@
 #pragma once
-#include <stdint.h>
-#include <stdbool.h>
-#include <assert.h>
+
+#ifdef __cplusplus
+    #include <cstdint>
+    #include <cassert>
+    #define restrict // suppress any error since cpp doesn't have this keyword
+    extern "C" {
+        #include <stdbool.h> // cstdbool is deprecated in cpp17 and removed in cpp20
+#else
+    #include <stdint.h>
+    #include <stdbool.h>
+    #include <assert.h>
+#endif
+
+
 
 #ifdef FORCED
     #warning "FORCED() macro already defined, inline may not performed"
@@ -101,4 +112,9 @@ static FORCED(inline) bool access_bit(const uint8_t *const restrict v, uint64_t 
         uint64_t byte_size = bytes_required(new_bit_capacity);
         return calc_align_index_based(byte_size - 1, sizeof(void *));
     }
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif
