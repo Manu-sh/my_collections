@@ -24,22 +24,32 @@
 #endif
 
 
+#if 0
 // ceil_div(x, 8) -> same of (int)ceil(x/8.)
 static FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) {
     return (num-1) / div + 1;
+}
+#endif
+
+// ceil_div8(x) -> same of ceil_div(x, 8)
+static FORCED(inline) uint64_t ceil_div8(uint64_t num) {
+    return (num + 7) >> 3;
 }
 
 // es. 9 bit requires 2 byte -> byte_required(9) -> 2
 // this function return at least 1
 static FORCED(inline) uint64_t bytes_required(uint64_t bits) {
-    return bits == 0 ? 1 : ceil_div(bits, 8);
+    //return (bits == 0) + ceil_div(bits, 8); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
+    return (bits == 0) + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
 }
 
-static inline void set_bit(uint8_t *byte, uint8_t i) {
+static inline void set_bit(uint8_t *restrict byte, uint8_t i) {
+    assert(i < 8);
     *byte |= (1 << (7-i));
 }
 
-static FORCED(inline) void clear_bit(uint8_t *byte, uint8_t i) {
+static FORCED(inline) void clear_bit(uint8_t *restrict byte, uint8_t i) {
+    assert(i < 8);
     *byte &= ~(1 << (7-i));
 }
 
@@ -54,18 +64,29 @@ static FORCED(inline) uint8_t take_few_bits(uint8_t byte, uint8_t bit_length) {
     return byte >> (8 - bit_length);
 }
 
-static FORCED(inline) void assign_bit(uint8_t *v, uint64_t bit_index, bool value) {
+static FORCED(inline) void assign_bit(uint8_t *restrict v, uint64_t bit_index, bool value) {
+    const uint64_t byte_idx = bit_index >> 3; // (i/8)
+    (void)(value ? set_bit(v + byte_idx, bit_index & 7) : clear_bit(v + byte_idx, bit_index & 7));  // i&7 -> i%8
+
+    /*
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
     uint8_t *const bit_pack = v + byte_idx;
     (void)(value ? set_bit(bit_pack, bit_index & 7) : clear_bit(bit_pack, bit_index & 7));  // i&7 -> i%8
+     */
     //(void)(value ? set_bit(v + (bit_index >> 3), bit_index & 7) : clear_bit(v + (bit_index >> 3), bit_index & 7));  // i&7 -> i%8
 }
 
 // https://github.com/Manu-sh/huffman/blob/main/include/bitarray/BitArray.hpp#L166
-static FORCED(inline) bool access_bit(const uint8_t *v, uint64_t bit_index) {
+static FORCED(inline) bool access_bit(const uint8_t *const restrict v, uint64_t bit_index) {
+    const uint64_t byte_idx = bit_index >> 3; // (i/8)
+    return (v[byte_idx] >> (7 - (bit_index&7))) & 1;  // i&7 -> i%8
+
+    /*
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
     const uint8_t *const bit_pack = v + byte_idx;
     return ((*bit_pack) >> (7 - (bit_index&7))) & 1;  // i&7 -> i%8
+    */
+    // return ((v[bit_index >> 3]) >> (7 - (bit_index&7))) & 1;  // i&7 -> i%8
 }
 
 
