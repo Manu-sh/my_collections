@@ -40,7 +40,8 @@ static FORCED(inline) uint64_t ceil_div8(uint64_t num) {
 // this function return at least 1
 static FORCED(inline) uint64_t bytes_required(uint64_t bits) {
     //return (bits == 0) + ceil_div(bits, 8); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
-    return (bits == 0) + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
+    //return (bits == 0) + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
+    return !!bits + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
 }
 
 static inline void set_bit(uint8_t *restrict byte, uint8_t i) {
