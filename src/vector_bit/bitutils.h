@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <stdbool.h>
+#include <assert.h>
 
 #ifdef FORCED
     #warning "FORCED() macro already defined, inline may not performed"
