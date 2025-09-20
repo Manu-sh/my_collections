@@ -56,7 +56,8 @@ static FORCED(inline) uint8_t take_few_bits(uint8_t byte, uint8_t bit_length) {
 static FORCED(inline) void assign_bit(uint8_t *v, uint64_t bit_index, bool value) {
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
     uint8_t *const bit_pack = v + byte_idx;
-    value ? set_bit(bit_pack, bit_index & 7) : clear_bit(bit_pack, bit_index & 7);  // i&7 -> i%8
+    (void)(value ? set_bit(bit_pack, bit_index & 7) : clear_bit(bit_pack, bit_index & 7));  // i&7 -> i%8
+    //(void)(value ? set_bit(v + (bit_index >> 3), bit_index & 7) : clear_bit(v + (bit_index >> 3), bit_index & 7));  // i&7 -> i%8
 }
 
 // https://github.com/Manu-sh/huffman/blob/main/include/bitarray/BitArray.hpp#L166

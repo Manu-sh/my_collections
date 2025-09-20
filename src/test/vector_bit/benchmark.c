@@ -8,6 +8,8 @@
 int main() {
 
     vector_bit *vct = vector_bit_new();
+	vector_bit_resize(vct, 8 * 256000000u);
+
     for (uint64_t i = 0; i < 8 * 256000000u; ++i) { // 256MB of bits
         vector_bit_push(vct, !(i & 1));
         //printf("bit[%d] = %d\n", i, vector_bit_access(vct, i));
