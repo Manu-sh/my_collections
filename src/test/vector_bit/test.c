@@ -64,6 +64,7 @@ static void test_push_vector_bit() {
         REQUIRE(vector_bit_length(vct) == i);
 
         REQUIRE(vector_bit_capacity(vct) == 8);
+        //printf("%d\n", vector_bit_last_element_byte_idx(vct));
         REQUIRE(vector_bit_last_element_byte_idx(vct) == 0);
         REQUIRE(vector_bit_effective_byte_size(vct) == 1);
         REQUIRE(vector_bit_padding_bits(vct) == 8-i);

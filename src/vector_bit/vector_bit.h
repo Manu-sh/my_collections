@@ -50,7 +50,8 @@ static FORCED(inline) bool vector_bit_access(const vector_bit *self, uint64_t bi
 
 
 static FORCED(inline) bool vector_bit_is_empty(const vector_bit *self) {
-    return self->bit_idx == 0;
+    //return self->bit_idx == 0;
+    return !self->bit_idx;
 }
 
 
@@ -153,7 +154,8 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     }
 
     static FORCED(inline) uint64_t vector_bit_last_bit_idx(const vector_bit *self) {
-        return self->bit_idx - (self->bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+        //return self->bit_idx - (self->bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+        return self->bit_idx - !!self->bit_idx; // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
     }
 
 
@@ -163,7 +165,7 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     // 0 if no bits are stored
     static FORCED(inline) uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
         uint64_t tmp = vector_bit_length(self);
-        return tmp == 0 ? 0 : bytes_required(tmp);
+        return !tmp ? 0 : bytes_required(tmp);
     }
 
 
@@ -174,7 +176,7 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
         // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
 
         uint64_t tmp = vector_bit_effective_byte_size(self);
-        return tmp - (tmp != 0); // same of: effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
+        return tmp - !!tmp; // same of: effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
     }
 
     // never null, return the back byte including padding bits or a block with meaningless bits
