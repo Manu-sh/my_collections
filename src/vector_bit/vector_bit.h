@@ -166,7 +166,7 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     // 0 if no bits are stored
     static FORCED(inline) uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
         uint64_t tmp = vector_bit_length(self);
-        return !tmp ? 0 : bytes_required(tmp);
+        return UNLIKELY(!tmp) ? 0 : bytes_required(tmp);
     }
 
 
@@ -190,14 +190,14 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
 
     // how many padding bits you have, es. i have 5 bit into self and i have 3 bit of padding (obv you cannot allocate a single bit you have to allocate a byte)
     static FORCED(inline) uint8_t vector_bit_padding_bits(const vector_bit *self) {
-        return vector_bit_has_padding_bits(self) ? 8 - (self->bit_idx & 7) : 0;
+        return LIKELY(vector_bit_has_padding_bits(self)) ? 8 - (self->bit_idx & 7) : 0;
     }
 
 
     // cut away the padding bits from the last byte & return the last byte
     static FORCED(inline) uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
         uint8_t back_byte_with_padding_bits = *vector_bit_back_byte(self);
-        return vector_bit_has_padding_bits(self) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
+        return LIKELY(vector_bit_has_padding_bits(self)) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
     }
 #endif
 
@@ -205,13 +205,13 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     // TODO: questa funzione va testata attentamente
     static bool vector_bit_push_all(vector_bit *self, const uint8_t *v, uint64_t bit_length) {
 
-        if (bit_length == 0)
+        if (UNLIKELY(bit_length == 0))
             return true;
 
         // we are lucky 'cause we can block-copy
         //if (this->bit_length() % 8 == 0) {
         //if (!(bit_length() & 7)) {
-        if (!vector_bit_has_padding_bits(self)) {
+        if (UNLIKELY(!vector_bit_has_padding_bits(self))) {
 
             auto sz = vector_bit_is_empty(self) ? 0 : bytes_required(self->bit_idx);
             auto o_sz = bytes_required(bit_length);
