@@ -24,6 +24,13 @@
 #endif
 
 
+//#define likely(x)       __builtin_expect(!!(x), 1)
+//#define unlikely(x)     __builtin_expect(!!(x), 0)
+#define LIKELY(_EXP_)       __builtin_expect(_EXP_, 1)
+#define UNLIKELY(_EXP_)     __builtin_expect(_EXP_, 0)
+
+
+
 #if 0
     // ceil_div(x, 8) -> same of (int)ceil(x/8.)
     static FORCED(inline) uint64_t ceil_div(uint64_t num, uint8_t div) {
@@ -41,7 +48,9 @@ static FORCED(inline) uint64_t ceil_div8(uint64_t num) {
 static FORCED(inline) uint64_t bytes_required(uint64_t bits) {
     //return (bits == 0) + ceil_div(bits, 8); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
     // return (bits == 0) + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
+   //return !bits + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
    return !bits + ceil_div8(bits); // same of: return bits == 0 ? 1 : ceil_div(bits, 8);
+   //return bits == 0 ? 1 : __builtin_expect(ceil_div8(bits), 1);
 }
 
 static inline void set_bit(uint8_t *restrict byte, uint8_t i) {
