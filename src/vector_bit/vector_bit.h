@@ -250,6 +250,25 @@ static bool vector_bit_push_all(vector_bit *self, const uint8_t *src, uint64_t b
 
 }
 
+// TODO: test me
+static FORCED(inline) bool vector_bit_compare(const vector_bit *self, const vector_bit *other) {
+
+    // same length
+    if (vector_bit_length(self) != vector_bit_length(other))
+        return false;
+
+    // same back-byte
+    if (vector_bit_back_byte_without_padding(self) != vector_bit_back_byte_without_padding(other))
+        return vector_bit_length(self); // there could be 2 elements both of size 0 uninitialized
+
+    // this value can be zero and memcpy doesn't like it, at this point we already checked that back_byte() is the same for both
+    if (vector_bit_effective_byte_size(self) <= 1)
+        return true;
+
+    // we can safely use memcpy since both vector have the same length and this is a number >= 2
+    return memcmp((void *)self->v, (void *)other->v, vector_bit_effective_byte_size(self) - 1) == 0; // -1 to skip the back_byte already evaluated and that could contain padding bits (garbage)
+}
+
 #ifdef __cplusplus
     }
 #endif
