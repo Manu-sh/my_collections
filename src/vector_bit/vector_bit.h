@@ -213,43 +213,42 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
     }
 #endif
 
-#if 0
-    // TODO: questa funzione va testata attentamente
-    static bool vector_bit_push_all(vector_bit *self, const uint8_t *v, uint64_t bit_length) {
+// TODO: questa funzione va testata attentamente
+static bool vector_bit_push_all(vector_bit *self, const uint8_t *src, uint64_t bit_length) {
 
-        if (UNLIKELY(bit_length == 0))
-            return true;
+    // uint64_t rest_bit = bit_length & 7;
+    // uint64_t byte_length = (bit_length - rest_bit) >> 3;
 
-        // we are lucky 'cause we can block-copy
-        //if (this->bit_length() % 8 == 0) {
-        //if (!(bit_length() & 7)) {
-        if (UNLIKELY(!vector_bit_has_padding_bits(self))) {
+    // we are lucky 'cause we can block-copy
+    if (UNLIKELY(!vector_bit_has_padding_bits(self))) { // if (this->bit_length() % 8 == 0)
 
-            auto sz = vector_bit_is_empty(self) ? 0 : bytes_required(self->bit_idx);
-            auto o_sz = bytes_required(bit_length);
+        // if bit_length is not a multiple of 8, it's not a problem because the minimum addressable unit is 1 byte.
+        // or more, so we can be sure that if bit_length were 9, there would be 2 bytes and not 1 byte.
 
-            if (self->bit_capacity < sz + o_sz)
-                if (!vector_bit_resize(self, (sz + o_sz) * 8 )) // 5+1 = 6
-                    return false;
+        uint64_t sz   = bytes_required( vector_bit_length(self) );
+        uint64_t o_sz = bytes_required(bit_length);
 
-            assert(v != self->v);  // non dovrebbe mai succedere, eventualmente se &o == this usare memmove()
+        if (UNLIKELY(!vector_bit_resize(self, (sz + o_sz) * 8 ))) // 5+1 = 6
+            return false;
 
-            void *dst = self->v + sz; // skip N bytes -> buf+5
-            memcpy(dst, v, o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
+        assert(src != self->v);  // non dovrebbe mai succedere, eventualmente se &o == this usare memmove()
+        assert(vector_bit_byte_capacity(self) >= sz + o_sz);
 
-            self->bit_idx += bit_length;
-            return true;
-        }
+        void *dst = (void *)(self->v + sz); // skip N bytes -> buf+5
+        memcpy(dst, src, o_sz); // cpy(&buf[5], src, 1) -> this copy 1 byte starting from address 5 which is writeable because the size is 6
 
-        for (uint64_t i = 0; i < bit_length; ++i) {
-            bool bit_value = access_bit(v, i);
-            vector_bit_push(self, bit_value);
-        }
-
+        self->bit_idx += bit_length;
         return true;
     }
-#endif
 
+    for (uint64_t i = 0; i < bit_length; ++i) {
+        bool bit_value = access_bit(src, i);
+        vector_bit_push(self, bit_value);
+    }
+
+    return true;
+
+}
 
 #ifdef __cplusplus
     }
