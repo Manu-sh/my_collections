@@ -422,7 +422,24 @@ void test_concat_vector_bit() {
 }
 
 
+#include "../../allocators/allocator_posix_align.h"
+
 int main() {
+
+    allocator_posix_align al = allocator_posix_align_new(120, AL512);
+
+    printf("alignment: %u\n", al.alignment);
+    printf("size: %lu\n", al.size);
+    printf("p: %p\n", al.p);
+
+    allocator_posix_align_grow(&al, 1020);
+    printf("alignment: %u\n", al.alignment);
+    printf("size: %lu\n", al.size);
+    printf("p: %p\n", al.p);
+
+    allocator_posix_align_free(&al);
+    return 0;
+
 
     test_vector_bit_from_cstr();
     test_concat_vector_bit();
