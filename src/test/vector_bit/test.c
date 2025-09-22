@@ -423,8 +423,16 @@ void test_concat_vector_bit() {
 
 
 #include "../../allocators/allocator_posix_align.h"
+#include "../../allocators/malloc_align.h"
 
 int main() {
+
+
+    void *p = malloc_align(120, AL_WORD);
+
+    realloc_align(p, 120);
+
+    return 0;
 
     allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
 

@@ -1,0 +1,53 @@
+#pragma once
+#include "allocator_posix_align.h"
+
+// 16 byte metadata
+typedef struct  __attribute__((__packed__)) {
+    uint64_t user_size;
+    uint64_t user_alignment; // alignment in bytes
+} malloc_metadata;
+
+
+// [metadata][user-memory]
+
+void * malloc_align(size_t size, posix_alignments alignment) {
+
+    uint64_t real_size = sizeof(malloc_metadata) + size; // reserve size for metadata
+
+    real_size = calc_align_index_based(real_size - 1, alignment); // -1 because real_size is not an index
+
+    void *real_block = NULL;
+    int ec = posix_memalign(&real_block, alignment, real_size);
+
+    if (UNLIKELY(ec))
+        return NULL;
+
+    malloc_metadata *metadata = ((malloc_metadata *)real_block);
+    metadata->user_size      = size;
+    metadata->user_alignment = alignment;
+
+    printf("address: %p\n", (void *)metadata);
+    printf("user-address: %p\n", (void *)(((unsigned char *)real_block) + sizeof(malloc_metadata)));
+
+    assert( (uintptr_t)(((unsigned char *)real_block) + sizeof(malloc_metadata)) % alignment == 0);
+
+    return ((unsigned char *)real_block) + sizeof(malloc_metadata);
+}
+
+
+void * realloc_align(void *p, size_t size) {
+
+    size = size;
+    malloc_metadata *real_block = (malloc_metadata *) (((unsigned char *)p) - (
+        sizeof(malloc_metadata)
+    ));
+
+    printf("user-address: %p\n", p);
+    printf("calc address: %p\n", (void *)real_block);
+
+    return 0;
+}
+
+void malloc_align_free(void *p) {
+    p = p;
+}

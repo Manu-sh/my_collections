@@ -15,9 +15,10 @@ typedef enum {
 
 
 typedef struct {
-    void *p;
     uint64_t size;
     posix_alignments alignment;
+
+    void *p; // ensure this is always the last member
 } allocator_posix_align;
 
 
