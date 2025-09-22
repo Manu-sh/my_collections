@@ -227,6 +227,8 @@ static bool vector_bit_push_all(vector_bit *self, const uint8_t *src, uint64_t b
     // uint64_t rest_bit = bit_length & 7;
     // uint64_t byte_length = (bit_length - rest_bit) >> 3;
 
+    // TODO: bug
+#if 0
     // we are lucky 'cause we can block-copy
     if (UNLIKELY(!vector_bit_has_padding_bits(self))) { // if (this->bit_length() % 8 == 0)
 
@@ -248,7 +250,7 @@ static bool vector_bit_push_all(vector_bit *self, const uint8_t *src, uint64_t b
         self->bit_idx += bit_length;
         return true;
     }
-
+#endif
     for (uint64_t i = 0; i < bit_length; ++i) {
         bool bit_value = access_bit(src, i);
         vector_bit_push(self, bit_value);
