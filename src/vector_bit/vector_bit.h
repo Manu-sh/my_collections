@@ -26,6 +26,8 @@ typedef struct {
     uint8_t *v;
 } vector_bit;
 
+#define VECTOR_BIT_DEFAULT_BIT_CAPACITY 8
+
 
 static vector_bit * vector_bit_new() {
 
@@ -34,7 +36,7 @@ static vector_bit * vector_bit_new() {
     if (!(self = (vector_bit *)calloc(1, sizeof(*self))))
         return NULL;
 
-    self->bit_capacity = 8;
+    self->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
     if (!(self->v = (uint8_t *)malloc( bytes_required(self->bit_capacity) ))) {
         free(self);
         return NULL;
@@ -268,6 +270,42 @@ static FORCED(inline) bool vector_bit_compare(const vector_bit *self, const vect
     // we can safely use memcpy since both vector have the same length and this is a number >= 2
     return memcmp((void *)self->v, (void *)other->v, vector_bit_effective_byte_size(self) - 1) == 0; // -1 to skip the back_byte already evaluated and that could contain padding bits (garbage)
 }
+
+
+static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
+    vector_bit *clone = vector_bit_new();
+    vector_bit_resize(clone, self->bit_capacity);
+    clone->bit_idx = self->bit_idx;
+    memcpy((void *)clone->v, (void *)self->v, vector_bit_effective_byte_size(self->v));
+}
+
+static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
+
+    if (dst == src) return;
+
+    if (dst->v == src->v) {
+        dst->bit_idx = src->bit_idx; // however this should never happen
+        goto src_reset;
+    }
+
+    free(dst->v); // free the current buffer
+
+    dst->v            = src->v;
+    dst->bit_idx      = src->bit_idx;
+    dst->bit_capacity = src->bit_capacity;
+
+
+src_reset:
+
+    // leave the moved vector in a properly stat
+    src->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
+    src->v = (uint8_t *)malloc( bytes_required(src->bit_capacity) );
+    src->bit_idx = 0;
+    assert(src->v);
+
+}
+
+
 
 #ifdef __cplusplus
     }
