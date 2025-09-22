@@ -12,12 +12,11 @@ typedef struct  __attribute__((__packed__)) {
 
 void * malloc_align(size_t size, posix_alignments alignment) {
 
-    uint64_t real_size = sizeof(malloc_metadata) + size; // reserve size for metadata
-
+    uint64_t real_size = sizeof(malloc_metadata) + size;                // reserve size for metadata
     real_size = calc_align_index_based(real_size - 1, alignment); // -1 because real_size is not an index
 
     void *real_block = NULL;
-    int ec = posix_memalign(&real_block, alignment, real_size);
+    const int ec = posix_memalign(&real_block, alignment, real_size);
 
     if (UNLIKELY(ec))
         return NULL;
@@ -26,8 +25,10 @@ void * malloc_align(size_t size, posix_alignments alignment) {
     metadata->user_size      = size;
     metadata->user_alignment = alignment;
 
+#if DEBUG
     printf("address: %p\n", (void *)metadata);
     printf("user-address: %p\n", (void *)(((unsigned char *)real_block) + sizeof(malloc_metadata)));
+#endif
 
     assert( (uintptr_t)(((unsigned char *)real_block) + sizeof(malloc_metadata)) % alignment == 0);
 
@@ -44,8 +45,10 @@ void * realloc_align(void *p, size_t size) {
         sizeof(malloc_metadata)
     ));
 
+#if DEBUG
     printf("user-address: %p\n", p);
     printf("calc address: %p\n", (void *)real_block);
+#endif
 
     if (UNLIKELY(size == real_block->user_size))
         return p;
@@ -72,8 +75,10 @@ void malloc_align_free(void *p) {
             sizeof(malloc_metadata)
     ));
 
+#if DEBUG
     printf("user-address: %p\n", p);
     printf("calc address: %p\n", (void *)real_block);
+#endif
 
     free(real_block);
 }
