@@ -430,8 +430,12 @@ int main() {
 
     void *p = malloc_align(120, AL_WORD);
 
-    realloc_align(p, 120);
 
+    void *tmp = realloc_align(p, 120);
+    if (tmp) p = tmp;
+
+
+    malloc_align_free(p);
     return 0;
 
     allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);

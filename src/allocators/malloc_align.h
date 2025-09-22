@@ -31,7 +31,10 @@ void * malloc_align(size_t size, posix_alignments alignment) {
 
     assert( (uintptr_t)(((unsigned char *)real_block) + sizeof(malloc_metadata)) % alignment == 0);
 
-    return ((unsigned char *)real_block) + sizeof(malloc_metadata);
+    return __builtin_assume_aligned(
+            ((unsigned char *)real_block) + sizeof(malloc_metadata),
+            alignment
+    );
 }
 
 
@@ -44,15 +47,22 @@ void * realloc_align(void *p, size_t size) {
     printf("user-address: %p\n", p);
     printf("calc address: %p\n", (void *)real_block);
 
+    if (UNLIKELY(size == real_block->user_size))
+        return p;
 
     void *user_memory = malloc_align(size, (posix_alignments)real_block->user_alignment);
     if (UNLIKELY(!user_memory))
         return NULL; // leave the block untouched
 
 
-    memcpy(user_memory, p, real_block->user_size); // copy user-data into user_memory
-    free(real_block);
+    // copy user-data into user_memory
+    memcpy(
+        __builtin_assume_aligned(user_memory, real_block->user_alignment),
+        __builtin_assume_aligned(p, real_block->user_alignment),
+        real_block->user_size
+    );
 
+    free(real_block);
     return user_memory;
 }
 
