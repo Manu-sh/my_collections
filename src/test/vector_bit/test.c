@@ -309,6 +309,10 @@ int main() {
     printf("capacity %zu\n", vector_bit_capacity(vct));
     assert(vector_bit_capacity(vct) >= 8);
 
+    // test an invalid pop()
+    vector_bit_fast_pop(vct);
+    assert(vector_bit_length(vct) == 0);
+
     vector_bit_free(vct);
     return 0;
 }

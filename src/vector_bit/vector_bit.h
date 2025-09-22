@@ -1,20 +1,21 @@
 #pragma once
+#define EXTRAS
 
 #ifdef __cplusplus
-    #include <cstdint>
-    #include <cstdlib>
-    #include <cstring>
-    #include <cassert>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
 
-    #define restrict // suppress any error since cpp doesn't have this keyword
-    extern "C" {
-        #include <stdbool.h> // cstdbool is deprecated in cpp17 and removed in cpp20
+#define restrict // suppress any error since cpp doesn't have this keyword
+extern "C" {
+#include <stdbool.h> // cstdbool is deprecated in cpp17 and removed in cpp20
 #else
-    #include <stdint.h>
-    #include <stdbool.h>
-    #include <stdlib.h>
-    #include <string.h>
-    #include <assert.h>
+#include <stdint.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <assert.h>
 #endif
 
 #include "bitutils.h"
@@ -125,6 +126,11 @@ bool vector_bit_pop(vector_bit *self) {
 }
 
 
+static FORCED(inline) void vector_bit_fast_pop(vector_bit *self) {
+    self->bit_idx -= !!self->bit_idx; // same of: bit_idx -= bit_idx > 0 ? 1 : 0
+}
+
+
 static bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 
     const uint64_t byte_capacity = bytes_required(bit_len);
@@ -163,56 +169,56 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
 
 #ifdef EXTRAS
 
-    /* FUNCTION TO DEAL WITH UNDERLING MEMORY */
-    static FORCED(inline) bool vector_bit_has_padding_bits(const vector_bit *self) {
-        return self->bit_idx & 7;
-    }
+/* FUNCTION TO DEAL WITH UNDERLING MEMORY */
+static FORCED(inline) bool vector_bit_has_padding_bits(const vector_bit *self) {
+    return self->bit_idx & 7;
+}
 
-    static FORCED(inline) uint64_t vector_bit_last_bit_idx(const vector_bit *self) {
-        //return self->bit_idx - (self->bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
-        return self->bit_idx - !!self->bit_idx; // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
-    }
-
-
+static FORCED(inline) uint64_t vector_bit_last_bit_idx(const vector_bit *self) {
+    //return self->bit_idx - (self->bit_idx != 0); // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+    return self->bit_idx - !!self->bit_idx; // same of: m_bit_idx == 0 ? m_bit_idx : m_bit_idx-1
+}
 
 
-    // how many bytes you effectively need to store the amount of bits that vector_bit actually contains
-    // 0 if no bits are stored
-    static FORCED(inline) uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
-        uint64_t tmp = vector_bit_length(self);
-        return UNLIKELY(!tmp) ? 0 : bytes_required(tmp);
-    }
 
 
-    // last_element_byte_idx() -> accessing v[ last_element_byte_idx() ] is always valid
-    static FORCED(inline) uint64_t vector_bit_last_element_byte_idx(const vector_bit *self) {
-
-        // self->bit_idx point to the next unused bit
-        // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
-
-        uint64_t tmp = vector_bit_effective_byte_size(self);
-        return tmp - !!tmp; // same of: effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
-    }
-
-    // never null, return the back byte including padding bits or a block with meaningless bits
-    // es. you have 14 bit stored into a v of 256 bit capacity, this function return &v[1]
-    // these function are useful when you have to deal with memory to make copy with memcpy etc.
-    static FORCED(inline) uint8_t * vector_bit_back_byte(const vector_bit *self) {
-        assert(vector_bit_length(self) > 0);
-        return self->v + vector_bit_last_element_byte_idx(self);
-    }
-
-    // how many padding bits you have, es. i have 5 bit into self and i have 3 bit of padding (obv you cannot allocate a single bit you have to allocate a byte)
-    static FORCED(inline) uint8_t vector_bit_padding_bits(const vector_bit *self) {
-        return LIKELY(vector_bit_has_padding_bits(self)) ? 8 - (self->bit_idx & 7) : 0;
-    }
+// how many bytes you effectively need to store the amount of bits that vector_bit actually contains
+// 0 if no bits are stored
+static FORCED(inline) uint64_t vector_bit_effective_byte_size(const vector_bit *self) {
+    uint64_t tmp = vector_bit_length(self);
+    return UNLIKELY(!tmp) ? 0 : bytes_required(tmp);
+}
 
 
-    // cut away the padding bits from the last byte & return the last byte
-    static FORCED(inline) uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
-        uint8_t back_byte_with_padding_bits = *vector_bit_back_byte(self);
-        return LIKELY(vector_bit_has_padding_bits(self)) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
-    }
+// last_element_byte_idx() -> accessing v[ last_element_byte_idx() ] is always valid
+static FORCED(inline) uint64_t vector_bit_last_element_byte_idx(const vector_bit *self) {
+
+    // self->bit_idx point to the next unused bit
+    // if we have 8 bit stored his value is 8 but the last element is stored into this[7]
+
+    uint64_t tmp = vector_bit_effective_byte_size(self);
+    return tmp - !!tmp; // same of: effective_byte_size() == 0 ? 0 : effective_byte_size() - 1;
+}
+
+// never null, return the back byte including padding bits or a block with meaningless bits
+// es. you have 14 bit stored into a v of 256 bit capacity, this function return &v[1]
+// these function are useful when you have to deal with memory to make copy with memcpy etc.
+static FORCED(inline) uint8_t * vector_bit_back_byte(const vector_bit *self) {
+    assert(vector_bit_length(self) > 0);
+    return self->v + vector_bit_last_element_byte_idx(self);
+}
+
+// how many padding bits you have, es. i have 5 bit into self and i have 3 bit of padding (obv you cannot allocate a single bit you have to allocate a byte)
+static FORCED(inline) uint8_t vector_bit_padding_bits(const vector_bit *self) {
+    return LIKELY(vector_bit_has_padding_bits(self)) ? 8 - (self->bit_idx & 7) : 0;
+}
+
+
+// cut away the padding bits from the last byte & return the last byte
+static FORCED(inline) uint8_t vector_bit_back_byte_without_padding(const vector_bit *self) {
+    uint8_t back_byte_with_padding_bits = *vector_bit_back_byte(self);
+    return LIKELY(vector_bit_has_padding_bits(self)) ? take_few_bits(back_byte_with_padding_bits, 8-vector_bit_padding_bits(self)) : back_byte_with_padding_bits; // x&7 -> bit_length()%8
+}
 #endif
 
 // TODO: questa funzione va testata attentamente
@@ -272,13 +278,16 @@ static FORCED(inline) bool vector_bit_compare(const vector_bit *self, const vect
 }
 
 
+// deep copy
 static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
     vector_bit *clone = vector_bit_new();
     vector_bit_resize(clone, self->bit_capacity);
     clone->bit_idx = self->bit_idx;
-    memcpy((void *)clone->v, (void *)self->v, vector_bit_effective_byte_size(self->v));
+    memcpy((void *)clone->v, (void *)self->v, vector_bit_effective_byte_size(self));
+    return clone;
 }
 
+// just like a cpp move: move src into dst.
 static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
     if (dst == src) return;
@@ -288,25 +297,24 @@ static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
         goto src_reset;
     }
 
-    free(dst->v); // free the current buffer
+    free(dst->v); // free the current dst buffer
 
     dst->v            = src->v;
     dst->bit_idx      = src->bit_idx;
     dst->bit_capacity = src->bit_capacity;
 
 
-src_reset:
+    src_reset:
 
     // leave the moved vector in a properly stat
     src->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
     src->v = (uint8_t *)malloc( bytes_required(src->bit_capacity) );
     src->bit_idx = 0;
     assert(src->v);
-
 }
 
 
 
 #ifdef __cplusplus
-    }
+}
 #endif
