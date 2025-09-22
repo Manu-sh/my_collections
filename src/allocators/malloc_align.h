@@ -37,7 +37,6 @@ void * malloc_align(size_t size, posix_alignments alignment) {
 
 void * realloc_align(void *p, size_t size) {
 
-    size = size;
     malloc_metadata *real_block = (malloc_metadata *) (((unsigned char *)p) - (
         sizeof(malloc_metadata)
     ));
@@ -45,9 +44,26 @@ void * realloc_align(void *p, size_t size) {
     printf("user-address: %p\n", p);
     printf("calc address: %p\n", (void *)real_block);
 
-    return 0;
+
+    void *user_memory = malloc_align(size, (posix_alignments)real_block->user_alignment);
+    if (UNLIKELY(!user_memory))
+        return NULL; // leave the block untouched
+
+
+    memcpy(user_memory, p, real_block->user_size); // copy user-data into user_memory
+    free(real_block);
+
+    return user_memory;
 }
 
 void malloc_align_free(void *p) {
-    p = p;
+
+    malloc_metadata *real_block = (malloc_metadata *) (((unsigned char *)p) - (
+            sizeof(malloc_metadata)
+    ));
+
+    printf("user-address: %p\n", p);
+    printf("calc address: %p\n", (void *)real_block);
+
+    free(real_block);
 }
