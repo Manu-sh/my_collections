@@ -31,10 +31,14 @@ static FORCED(inline) uint64_t calc_align_index_based(uint64_t index, uint64_t a
     return 2 << (log - 1);
 }
 
+static FORCED(inline) uint64_t calc_align_size_based(uint64_t byte_size, uint64_t align) {
+    return calc_align_index_based(byte_size - 1, align); // -1 because real_size is not an index and doesn't require to be accessible
+}
+
 
 // return bytes
 static FORCED(inline) uint64_t calc_mem_size(uint64_t byte_size) {
-    return calc_align_index_based(byte_size - 1, sizeof(void *));
+    return calc_align_size_based(byte_size, sizeof(void *));
 }
 
 
@@ -46,7 +50,7 @@ allocator_posix_align * allocator_posix_align_new(uint64_t byte_size, posix_alig
         return NULL;
 
     self->alignment = alignment;
-    self->size = calc_align_index_based(byte_size - 1, alignment);
+    self->size = calc_align_size_based(byte_size, alignment);
 
     int ec = posix_memalign(&self->p, self->alignment, self->size);
 
@@ -70,7 +74,7 @@ allocator_posix_align * allocator_posix_align_resize(allocator_posix_align *self
     allocator_posix_align rollback = *self;
     rollback.p = __builtin_assume_aligned(rollback.p, rollback.alignment);
 
-    self->size = calc_align_index_based(byte_size - 1, self->alignment);
+    self->size = calc_align_size_based(byte_size, self->alignment);
 
     if (self->size == rollback.size) // es. im asking for 768 byte but the closest number that is also a pow of 2 still 1024 which is the real size of self->p
         return self;
