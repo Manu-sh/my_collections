@@ -1,6 +1,11 @@
 #pragma once
 #include "allocator_posix_align.h"
 
+#include <stdint.h>
+
+// malign: memory aligned
+
+
 // 16 byte metadata
 typedef struct  __attribute__((__packed__)) {
     uint64_t user_size;
@@ -10,7 +15,7 @@ typedef struct  __attribute__((__packed__)) {
 
 // [metadata][user-memory]
 
-void * malloc_align(size_t size, posix_alignments alignment) {
+void * malign_alloc(size_t size, posix_alignments alignment) {
 
     uint64_t real_size = sizeof(malloc_metadata) + size;                // reserve size for metadata
     real_size = calc_align_index_based(real_size - 1, alignment); // -1 because real_size is not an index
@@ -27,21 +32,21 @@ void * malloc_align(size_t size, posix_alignments alignment) {
 
 #if DEBUG
     printf("address: %p\n", (void *)metadata);
-    printf("user-address: %p\n", (void *)(((unsigned char *)real_block) + sizeof(malloc_metadata)));
+    printf("user-address: %p\n", (void *)(((uint8_t *)real_block) + sizeof(malloc_metadata)));
 #endif
 
-    assert( (uintptr_t)(((unsigned char *)real_block) + sizeof(malloc_metadata)) % alignment == 0);
+    assert( (uintptr_t)(((uint8_t *)real_block) + sizeof(malloc_metadata)) % alignment == 0);
 
     return __builtin_assume_aligned(
-            ((unsigned char *)real_block) + sizeof(malloc_metadata),
+            ((uint8_t *)real_block) + sizeof(malloc_metadata),
             alignment
     );
 }
 
 
-void * realloc_align(void *p, size_t size) {
+void * malign_realloc(void *p, size_t size) {
 
-    malloc_metadata *real_block = (malloc_metadata *) (((unsigned char *)p) - (
+    malloc_metadata *real_block = (malloc_metadata *) (((uint8_t *)p) - (
         sizeof(malloc_metadata)
     ));
 
@@ -53,7 +58,7 @@ void * realloc_align(void *p, size_t size) {
     if (UNLIKELY(size == real_block->user_size))
         return p;
 
-    void *user_memory = malloc_align(size, (posix_alignments)real_block->user_alignment);
+    void *user_memory = malign_alloc(size, (posix_alignments)real_block->user_alignment);
     if (UNLIKELY(!user_memory))
         return NULL; // leave the block untouched
 
@@ -69,9 +74,9 @@ void * realloc_align(void *p, size_t size) {
     return user_memory;
 }
 
-void malloc_align_free(void *p) {
+void malign_free(void *p) {
 
-    malloc_metadata *real_block = (malloc_metadata *) (((unsigned char *)p) - (
+    malloc_metadata *real_block = (malloc_metadata *) (((uint8_t *)p) - (
             sizeof(malloc_metadata)
     ));
 

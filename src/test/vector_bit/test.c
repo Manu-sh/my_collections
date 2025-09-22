@@ -423,19 +423,19 @@ void test_concat_vector_bit() {
 
 
 #include "../../allocators/allocator_posix_align.h"
-#include "../../allocators/malloc_align.h"
+#include "../../allocators/malign.h"
 
 int main() {
 
 
-    void *p = malloc_align(120, AL_WORD);
+    void *p = malign_alloc(120, AL_WORD);
 
 
-    void *tmp = realloc_align(p, 120);
+    void *tmp = malign_realloc(p, 120);
     if (tmp) p = tmp;
 
 
-    malloc_align_free(p);
+    malign_free(p);
     return 0;
 
     allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
