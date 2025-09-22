@@ -3,24 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 
-/*
- NOTE: to use inline you need to compile at least with c99, you can disable inline defining FORCED(_) as a macro that do nothing
- __STDC_VERSION__ is a macro defined with c95 (199409L)
-*/
-
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-#define FORCED(_)
-#endif
-
-
-/* just hope that is a real inline */
-#ifndef FORCED
-#define FORCED(_UNUSED_) inline __attribute__((always_inline))
-#endif
-
-#define LIKELY(_EXP_)       __builtin_expect(_EXP_, 1)
-#define UNLIKELY(_EXP_)     __builtin_expect(_EXP_, 0)
-
+#include "../common_c99/common-c99.h"
 
 typedef enum {
     AL_INVALID = 0,
@@ -68,7 +51,10 @@ allocator_posix_align allocator_posix_align_new(uint64_t byte_size, posix_alignm
     int ec = posix_memalign(&data.p, data.alignment, data.size);
     assert(ec == 0);
 
-    return LIKELY(!ec) ? data : invalid;
+    if (UNLIKELY(ec)) return invalid;
+
+    data.p = __builtin_assume_aligned(data.p, data.alignment);
+    return data;
 }
 
 
@@ -80,7 +66,7 @@ allocator_posix_align * allocator_posix_align_grow(allocator_posix_align *self, 
 
 
     allocator_posix_align ret = allocator_posix_align_new(byte_size, self->alignment);
-    memcpy(ret.p, self->p, self->size); // TODO: vettorizzazione
+    memcpy(__builtin_assume_aligned(ret.p, ret.alignment), __builtin_assume_aligned(self->p, self->alignment), self->size); // TODO: vettorizzazione
     free(self->p);
 
     *self = ret;
@@ -88,18 +74,7 @@ allocator_posix_align * allocator_posix_align_grow(allocator_posix_align *self, 
     return self;
 }
 
-
-
-
 void allocator_posix_align_free(allocator_posix_align *self) {
     free(self->p);
     memset(self, 0, sizeof(allocator_posix_align));
 }
-
-/*
-void * realloc_aligned(void *p, size_t bytes, unsigned char alignment) {
-    if (UNLIKELY(!p)) return NULL;
-
-    void *new_p = (void *)malloc_aligned(bytes, alignment);
-    memcpy(new_p, p)
-}*/

@@ -12,35 +12,7 @@
     #include <assert.h>
 #endif
 
-
-
-#ifdef FORCED
-    #warning "FORCED() macro already defined, inline may not performed"
-#endif
-
-
-/*
- NOTE: to use inline you need to compile at least with c99, you can disable inline defining FORCED(_) as a macro that do nothing
- __STDC_VERSION__ is a macro defined with c95 (199409L)
-*/
-
-#if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 199901L
-    #define FORCED(_)
-#endif
-
-
-/* just hope that is a real inline */
-#ifndef FORCED
-    #define FORCED(_UNUSED_) inline __attribute__((always_inline))
-#endif
-
-
-//#define likely(x)       __builtin_expect(!!(x), 1)
-//#define unlikely(x)     __builtin_expect(!!(x), 0)
-#define LIKELY(_EXP_)       __builtin_expect(_EXP_, 1)
-#define UNLIKELY(_EXP_)     __builtin_expect(_EXP_, 0)
-
-
+#include "../common_c99/common-c99.h"
 
 #if 0
     // ceil_div(x, 8) -> same of (int)ceil(x/8.)
