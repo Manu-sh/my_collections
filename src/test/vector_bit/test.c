@@ -426,7 +426,7 @@ void test_concat_vector_bit() {
 
 int main() {
 
-    allocator_posix_align *al = allocator_posix_align_new(120, AL64);
+    allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
 
     printf("alignment: %u\n", al->alignment);
     printf("size: %lu\n", al->size);

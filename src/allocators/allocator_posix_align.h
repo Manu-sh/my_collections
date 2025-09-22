@@ -6,14 +6,11 @@
 #include "../common_c99/common-c99.h"
 
 typedef enum {
-    AL_INVALID = 0,
-    AL8        = sizeof(void *),
-    AL16       =  AL8  * 2,
-    AL32       =  AL16 * 2,
-    AL64       =  AL32 * 2,
-    AL128      =  AL64 * 2,
-    AL256      = AL128 * 2,
-    AL512      = AL256 * 2
+    AL_INVALID  = 0,
+    AL_WORD     = sizeof(void *),     // standard alignment
+    AL_DWORD    = sizeof(void *) * 2, // 16 byte SSE
+    AL_QWORD    = sizeof(void *) * 4, // 32 byte avx2
+    AL_EWORD    = sizeof(void *) * 8, // 64 byte alignment avx512
 } posix_alignments;
 
 
