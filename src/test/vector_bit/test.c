@@ -426,18 +426,24 @@ void test_concat_vector_bit() {
 
 int main() {
 
-    allocator_posix_align al = allocator_posix_align_new(120, AL512);
+    allocator_posix_align *al = allocator_posix_align_new(120, AL64);
 
-    printf("alignment: %u\n", al.alignment);
-    printf("size: %lu\n", al.size);
-    printf("p: %p\n", al.p);
+    printf("alignment: %u\n", al->alignment);
+    printf("size: %lu\n", al->size);
+    printf("p: %p\n", al->p);
 
-    allocator_posix_align_grow(&al, 1020);
-    printf("alignment: %u\n", al.alignment);
-    printf("size: %lu\n", al.size);
-    printf("p: %p\n", al.p);
+    allocator_posix_align_grow(al, 1020);
+    printf("alignment: %u\n", al->alignment);
+    printf("size: %lu\n", al->size);
+    printf("p: %p\n", al->p);
 
-    allocator_posix_align_free(&al);
+
+    allocator_posix_align_shrink(al, 712);
+    printf("alignment: %u\n", al->alignment);
+    printf("size: %lu\n", al->size);
+    printf("p: %p\n", al->p);
+
+    allocator_posix_align_free(al);
     return 0;
 
 
