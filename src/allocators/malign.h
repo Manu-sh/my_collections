@@ -109,7 +109,8 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
 
     assert(metadata->user_alignment >= sizeof(malign_metadata **)); // enough space for metadata pointer
     const uint8_t malign_blk_size = metadata->user_alignment;
-    const uint64_t new_size = malign_blk_size + round_up_to_word(size, (posix_alignments)metadata->user_alignment); // reserved + aligned block
+    const uint64_t new_user_block_real_size = round_up_to_word(size, (posix_alignments)metadata->user_alignment);
+    const uint64_t new_size = malign_blk_size + new_user_block_real_size; // reserved + aligned block
 
     #ifdef DEBUG
         printf("%s ask for blk size %lu\n", __func__, new_size);
@@ -134,12 +135,26 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     // move the ownership of metadata pointer
     *new_metadata = (malign_metadata *)metadata; // remove the const qualifier, im the ownership now
 
+    #ifdef DEBUG
+        printf("%s src-block-address: %p\n", __func__, user_pointer);
+        printf("%s user-block-alignment: %hu\n", __func__, metadata->user_alignment);
+        printf("%s src-block-size: %lu\n", __func__, metadata->user_size);
+        printf("%s src-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
+
+        printf("%s new-block-real-size: %lu\n", __func__, new_size);
+    #endif
+
+    // TODO: prendere min(a, b)
+
     // copy user-data into user_memory
     memcpy(
         __builtin_assume_aligned(new_user_pointer, metadata->user_alignment),
         __builtin_assume_aligned(user_pointer, metadata->user_alignment),
         //metadata->user_size
-        malign_meta_user_real_size(metadata)
+        MIN( // TODO: migliorare sta roba: round_up_to_word(size, (posix_alignments)metadata->user_alignment)
+            malign_meta_user_real_size(metadata),
+            new_user_block_real_size
+        )
     );
 
     free(real_block);

@@ -3,6 +3,9 @@
 
 #include "../common_c99/common-c99.h"
 
+
+#define MIN(a,b) (((a)<(b))?(a):(b))
+
 // log2 for n which must be a pow of 2
 static FORCED(inline) uint64_t log2fast(uint64_t n_pow_of_2) {
     //return 63 - __builtin_clzll(n_pow_of_2);
