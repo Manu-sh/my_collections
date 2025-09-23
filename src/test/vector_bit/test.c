@@ -422,6 +422,7 @@ void test_concat_vector_bit() {
 }
 
 
+#define DEBUG
 #include "../../allocators/allocator_posix_align.h"
 #include "../../allocators/malign.h"
 
@@ -431,13 +432,13 @@ int main() {
     //void *p = malign_alloc(113, AL_WORD);
     void *p = malign_alloc(113, AL_QWORD);
     //void *p = malign_alloc(113, AL_EWORD);
-
-
+p = p;
+/*
     void *tmp = malign_realloc(p, 113);
     if (tmp) p = tmp;
 
 
-    malign_free(p);
+    malign_free(p);*/
     return 0;
 
     allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
