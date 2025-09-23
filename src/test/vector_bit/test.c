@@ -430,15 +430,11 @@ int main() {
 
 
     //void *p = malign_alloc(113, AL_WORD);
-    //void *p = malign_alloc(113, AL_WORD);
-    void *p = malign_alloc(113, AL_EWORD);
-p = p;
-/*
-    void *tmp = malign_realloc(p, 113);
+    void *p = malign_alloc(113, AL_WORD);
+    //void *p = malign_alloc(113, AL_EWORD);
+
+    void *tmp = malign_realloc(p, 12);
     if (tmp) p = tmp;
-
-
-    */
 
     malign_free(p);
     return 0;

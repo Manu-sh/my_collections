@@ -1,5 +1,5 @@
 #pragma once
-#include "allocator_posix_align.h"
+#include "align_common.h"
 #include "malign_meta.h"
 #include <stdint.h>
 
@@ -16,14 +16,13 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
     // TODO: bisogna per forza allineare un blocco di alignment size in più, di questo blocco bisogna però leggere SOLO gli ultimi 8 byte
 
     assert(sizeof(malign_metadata **) <= alignment);
-
     const uint64_t malign_blk_size = alignment;
 
     uint64_t real_size = malign_blk_size + size;   // reserve size for metadata
     real_size = calc_align_size_based(real_size, alignment); // -1 because real_size is not an index and doesn't require to be accessible
 
     #ifdef DEBUG
-        printf("ask for blk size %lu\n", real_size);
+        printf("%s ask for blk size %lu\n", __func__, real_size);
     #endif
 
 
@@ -35,7 +34,6 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
 
     // setup metadata
     void *const real_block = tmp_block;
-
     void *const user_pointer = ((uint8_t *)real_block) + malign_blk_size;
 
     // gli ultimi 8 byte di real_block sono un puntatore ai metadati
@@ -43,16 +41,15 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
             ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
     );
 
+    *metadata = malign_meta_new(size, alignment);
+    //*metadata = (malign_metadata *)(uintptr_t)0xdeadbeef;
 
-    //*metadata = malign_meta_new(size, alignment);
-    *metadata = (malign_metadata *)(uintptr_t)0xdeadbeef;
-
-#ifdef DEBUG
-    printf("%s block-address: %p\n", __func__, real_block);
-    printf("%s meta-address: %p\n", __func__, (void *)*metadata);
-    printf("%s user-address: %p\n", __func__, user_pointer);
-    puts("");
-#endif
+    #ifdef DEBUG
+        printf("%s block-address: %p\n", __func__, real_block);
+        printf("%s meta-address: %p\n", __func__, (void *)*metadata);
+        printf("%s user-address: %p\n", __func__, user_pointer);
+        puts("");
+    #endif
 
     assert( ((uintptr_t)((uint8_t *)user_pointer)) % alignment == 0);
 
@@ -62,38 +59,76 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
     );
 }
 
-#if 0
-// TODO: here
-void * malign_realloc(void *p, size_t size) {
+void * malign_realloc(void *user_pointer, size_t size) {
 
-    malloc_metadata *real_block = (malloc_metadata *) (((uint8_t *)p) - (
-        sizeof(malloc_metadata)
-    ));
+    // gli ultimi 8 byte di real_block sono un puntatore ai metadati
+    malign_metadata **metadata = (malign_metadata **) (
+        ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
+    );
 
-#ifdef DEBUG
-    printf("user-address: %p\n", p);
-    printf("calc address: %p\n", (void *)real_block);
-#endif
+    if (UNLIKELY(size == (*metadata)->user_size))
+        return user_pointer;
 
-    if (UNLIKELY(size == real_block->user_size))
-        return p;
+    // move the user pointer back to the begging of the block
+    void *real_block = ((uint8_t *)user_pointer) - (*metadata)->user_alignment;
 
-    void *user_memory = malign_alloc(size, (posix_alignments)real_block->user_alignment);
-    if (UNLIKELY(!user_memory))
+    #ifdef DEBUG
+        printf("%s block-address: %p\n", __func__, real_block);
+        printf("%s meta-address: %p\n", __func__, (void *)*metadata);
+        printf("%s user-address: %p\n", __func__, user_pointer);
+        puts("");
+    #endif
+
+    // il vecchio blocco va liberato ma i metadati no
+    // TODO: bisogna per forza allineare un blocco di alignment size in più, di questo blocco bisogna però leggere SOLO gli ultimi 8 byte
+
+    assert(sizeof(malign_metadata **) <= (*metadata)->user_alignment);
+    const uint64_t malign_blk_size = (*metadata)->user_alignment;
+
+    uint64_t real_size = malign_blk_size + size;   // reserve size for metadata
+    real_size = calc_align_size_based(real_size, (*metadata)->user_alignment); // -1 because real_size is not an index and doesn't require to be accessible
+
+    #ifdef DEBUG
+        printf("%s ask for blk size %lu\n", __func__, real_size);
+    #endif
+
+    void *tmp_block = NULL;
+    const int ec = posix_memalign(&tmp_block, (*metadata)->user_alignment, real_size);
+    if (UNLIKELY(ec))
         return NULL; // leave the block untouched
 
+    // setup metadata
+    void *const new_block = tmp_block;
+    void *const new_user_pointer = ((uint8_t *)new_block) + malign_blk_size;
+
+    // TODO: può darsi che basti usare memcpy a diritto
+    // setup metadata
+
+    // gli ultimi 8 byte di real_block sono un puntatore ai metadati
+    malign_metadata **new_metadata = (malign_metadata **) (
+        ((uint8_t *)new_user_pointer) - sizeof(malign_metadata **)
+    );
+
+    // move the metadata pointer
+    *new_metadata = *metadata;
 
     // copy user-data into user_memory
     memcpy(
-        __builtin_assume_aligned(user_memory, real_block->user_alignment),
-        __builtin_assume_aligned(p, real_block->user_alignment),
-        real_block->user_size
+        __builtin_assume_aligned(new_user_pointer, (*metadata)->user_alignment),
+        __builtin_assume_aligned(user_pointer, (*metadata)->user_alignment),
+        (*metadata)->user_size
     );
 
+    #ifdef DEBUG
+        printf("%s new-block-address: %p\n", __func__, new_block);
+        printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
+        printf("%s new-user-address: %p\n", __func__, new_user_pointer);
+        puts("");
+    #endif
+
     free(real_block);
-    return user_memory;
+    return new_user_pointer;
 }
-#endif
 
 
 void malign_free(void *user_pointer) {
@@ -104,15 +139,15 @@ void malign_free(void *user_pointer) {
     );
 
     // move the user pointer back to the begging of the block
-    //void *real_block = ((uint8_t *)user_pointer) - (*metadata)->user_alignment;
+    void *real_block = ((uint8_t *)user_pointer) - (*metadata)->user_alignment;
 
-#ifdef DEBUG
-    //printf("%s block-address: %p\n", __func__, real_block);
-    printf("%s meta-address: %p\n", __func__, (void *)*metadata);
-    printf("%s user-address: %p\n", __func__, user_pointer);
-    puts("");
-#endif
+    #ifdef DEBUG
+        printf("%s block-address: %p\n", __func__, real_block);
+        printf("%s meta-address: %p\n", __func__, (void *)*metadata);
+        printf("%s user-address: %p\n", __func__, user_pointer);
+        puts("");
+    #endif
 
-    //malign_meta_free(*metadata);
-    //free(real_block);
+    malign_meta_free(*metadata);
+    free(real_block);
 }
