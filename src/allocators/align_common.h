@@ -3,6 +3,14 @@
 
 #include "../common_c99/common-c99.h"
 
+typedef enum {
+    AL_INVALID  = 0,
+    AL_WORD     = sizeof(void *),     // standard alignment
+    AL_DWORD    = sizeof(void *) * 2, // 16 byte SSE
+    AL_QWORD    = sizeof(void *) * 4, // 32 byte avx2
+    AL_EWORD    = sizeof(void *) * 8, // 64 byte alignment avx512
+} posix_alignments;
+
 // a number where index is accessible and that number is multiple of align and a pow of 2
 // this function is used to round_up a memory block and meet the posix_memalign() requirements
 static FORCED(inline) uint64_t calc_align_index_based(uint64_t index, uint64_t align) {

@@ -5,15 +5,6 @@
 
 #include "align_common.h"
 
-typedef enum {
-    AL_INVALID  = 0,
-    AL_WORD     = sizeof(void *),     // standard alignment
-    AL_DWORD    = sizeof(void *) * 2, // 16 byte SSE
-    AL_QWORD    = sizeof(void *) * 4, // 32 byte avx2
-    AL_EWORD    = sizeof(void *) * 8, // 64 byte alignment avx512
-} posix_alignments;
-
-
 typedef struct {
     void *p;
     uint64_t size;

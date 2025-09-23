@@ -1,6 +1,8 @@
 #pragma once
-#include "allocator_posix_align.h"
 #include <stdint.h>
+#include <stdlib.h>
+
+#include "align_common.h"
 
 typedef struct  __attribute__((__packed__)) {
     uint64_t user_size;
