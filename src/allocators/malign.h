@@ -8,7 +8,7 @@
 #include <stdint.h>
 
 #ifndef DEBUG
-    #define DEBUG
+    //#define DEBUG
 #endif
 
 #ifdef DEBUG
@@ -161,20 +161,19 @@ void * malign_realloc(void *user_pointer, size_t size) {
     assert( ((uintptr_t)user_pointer)     % (*new_metadata)->user_alignment == 0);
 
     // copy user-data into user_memory
-    /*
     memcpy(
         __builtin_assume_aligned(new_user_pointer, (*metadata)->user_alignment),
         __builtin_assume_aligned(user_pointer, (*metadata)->user_alignment),
-        (*new_metadata)->user_size
+        (*metadata)->user_size
     );
-    */
 
 
+	/*
     memmove(
             new_user_pointer,
             user_pointer,
             (*new_metadata)->user_size
-    );
+    );*/
 
     (*new_metadata)->user_size = size;
     #ifdef DEBUG
