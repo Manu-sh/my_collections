@@ -8,19 +8,22 @@
 
 
 /*
- * TODO:
-    la potenza di 2 è il vincolo sull'indirizzo
-    non sul blocco
-    io lo sto facendo anche sulla size del blocco
- */
+    vincoli rispettati:
+        - user_pointer punta ad un blocco che è grande un multiplo di alignment
+        - user_pointer è un'indirizzo multiplo di alignment
+
+        - user_pointer - sizeof(void *) è sempre accessibile ed è un puntatore
+
+          TODO: probabilmente va usato un puntatore singolo e non doppio
+*/
+
 // TODO: non fa il check dell'overflow sulle moltiplicazioni
 
 // [pointer-metadata][user-memory]
 void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
     assert(alignment >= sizeof(malign_metadata **)); // enough space for metadata pointer
-    const uint64_t malign_blk_size = alignment;
-
+    const uint8_t malign_blk_size = alignment;
     const uint64_t real_size = malign_blk_size + round_up_to_word(size, alignment); // reserved + aligned block
     uint8_t *real_block = (uint8_t *)malloc(real_size);
 

@@ -4,7 +4,7 @@
 
 #include "align_common.h"
 
-typedef struct  __attribute__((__packed__)) {
+typedef struct __attribute__((__packed__)) {
     uint64_t user_size;      // size in bytes
     uint8_t  user_alignment; // alignment in bytes
     uint8_t  offset;         // distance (in bytes) between real_block and user_block, currently used only by malign.h
