@@ -63,7 +63,6 @@ io lo sto facendo anche sulla size del blocco.
 
 l'user-block dev'essere grande un multiplo di una w
 
-
  L'indirizzo che restituisci deve dare 0 se fai
 (uintptr_t)mem % sizeof(max_aligned_t)
  */
@@ -77,38 +76,4 @@ int main() {
 
     malign_free(p);
     return 0;
-
-    #if 0
-        //void *p = malign_alloc(113, AL_WORD);
-        void *p = malign_posix_alloc(113, AL_WORD);
-        //void *p = malign_alloc(113, AL_EWORD);
-
-        memset(p, 0xff, 113);
-
-        void *tmp = malign_posix_realloc(p, 256000000);
-        if (tmp) p = tmp;
-
-        malign_posix_free(p);
-        return 0;
-
-        allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
-
-        printf("alignment: %u\n", al->alignment);
-        printf("size: %lu\n", al->size);
-        printf("p: %p\n", al->p);
-
-        allocator_posix_align_grow(al, 1020);
-        printf("alignment: %u\n", al->alignment);
-        printf("size: %lu\n", al->size);
-        printf("p: %p\n", al->p);
-
-
-        allocator_posix_align_shrink(al, 712);
-        printf("alignment: %u\n", al->alignment);
-        printf("size: %lu\n", al->size);
-        printf("p: %p\n", al->p);
-
-        allocator_posix_align_free(al);
-        return 0;
-    #endif
 }
