@@ -48,8 +48,14 @@ static FORCED(inline) uint64_t get_real_block_size(const malign_metadata *metada
 // void *user_pointer = real_block + offset;
 static FORCED(inline) uint8_t calc_offset(void *real_block, uint8_t alignment) {
     // TODO: provare a ottimizzare % sarà una potenza di 2: a%b -> a&(b-1)
+    /*
     return alignment - (
         ((uintptr_t)real_block) % alignment
+    );
+     */
+
+    return alignment - (
+        ((uintptr_t)real_block) & (alignment - 1)
     );
 }
 
@@ -78,6 +84,7 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
     // TODO: tecnicamente allineando a 8 non è possibile neanche usare SSE, quindi 8 come valore non ha molto senso
     assert( ((uintptr_t)((uint8_t *)user_pointer)) % alignment == 0); // ensure the pointer is properly aligned
+    assert( (((uintptr_t)((uint8_t *)user_pointer)) & (alignment-1)) == 0); // ensure the pointer is properly aligned
 
     #ifdef DEBUG
         printf("%s real-block-address: %p\n", __func__, real_block);
