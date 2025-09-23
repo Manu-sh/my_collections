@@ -140,7 +140,6 @@ void * malign_realloc(void *user_pointer, size_t size) {
 
     // move the metadata pointer
     *new_metadata = *metadata;
-    (*new_metadata)->user_size = size;
 
 
     #ifdef DEBUG
@@ -177,6 +176,7 @@ void * malign_realloc(void *user_pointer, size_t size) {
             (*new_metadata)->user_size
     );
 
+    (*new_metadata)->user_size = size;
     #ifdef DEBUG
         printf("%s new-block-address: %p\n", __func__, new_block);
         printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
