@@ -111,6 +111,7 @@ void * malign_realloc(void *user_pointer, size_t size) {
 
     // move the metadata pointer
     *new_metadata = *metadata;
+    (*new_metadata)->user_size = size;
 
     // copy user-data into user_memory
     memcpy(
