@@ -3,7 +3,6 @@
 
 #include "../common_c99/common-c99.h"
 
-
 #define MIN(a,b) (((a)<(b))?(a):(b))
 
 // log2 for n which must be a pow of 2
@@ -31,29 +30,28 @@ static FORCED(inline) uint64_t round_up_to_word(uint64_t size, posix_alignments 
     return ((index >> log2) + 1) << log2; // same of: return (index / align + 1) * align; when align is a pow of 2
 }
 
-
-// const uint64_t rounded_up = (index / align + 1) * align;
-static FORCED(inline) uint64_t round_up(uint64_t size, uint64_t align) {
-     uint64_t index = size - 1; // TODO: cambiare in size - !!size
-     return (index / align + 1) * align;
-}
-
 #if 0
-// a number where index is accessible and that number is multiple of align and a pow of 2
-// this function is used to round_up a memory block and meet the posix_memalign() requirements
-static FORCED(inline) uint64_t calc_align_index_based(uint64_t index, uint64_t align) {
-    const uint64_t rounded_up = (index / align + 1) * align; // closest number multiple of align
-    const uint64_t log = 64 - __builtin_clzll(rounded_up - 1); // find the smallest pow2 that can contain roundend_up
-    return 2 << (log - 1);
-}
+    // const uint64_t rounded_up = (index / align + 1) * align;
+    static FORCED(inline) uint64_t round_up(uint64_t size, uint64_t align) {
+         uint64_t index = size - 1; // TODO: cambiare in size - !!size
+         return (index / align + 1) * align;
+    }
 
-// TODO: bug con size 0?
-static FORCED(inline) uint64_t calc_align_size_based(uint64_t byte_size, uint64_t align) {
-    return calc_align_index_based(byte_size - 1, align); // -1 because real_size is not an index and doesn't require to be accessible
-}
+    // a number where index is accessible and that number is multiple of align and a pow of 2
+    // this function is used to round_up a memory block and meet the posix_memalign() requirements
+    static FORCED(inline) uint64_t calc_align_index_based(uint64_t index, uint64_t align) {
+        const uint64_t rounded_up = (index / align + 1) * align; // closest number multiple of align
+        const uint64_t log = 64 - __builtin_clzll(rounded_up - 1); // find the smallest pow2 that can contain roundend_up
+        return 2 << (log - 1);
+    }
 
-// return bytes
-static FORCED(inline) uint64_t calc_mem_size(uint64_t byte_size) {
-    return calc_align_size_based(byte_size, sizeof(void *));
-}
+    // TODO: bug con size 0?
+    static FORCED(inline) uint64_t calc_align_size_based(uint64_t byte_size, uint64_t align) {
+        return calc_align_index_based(byte_size - 1, align); // -1 because real_size is not an index and doesn't require to be accessible
+    }
+
+    // return bytes
+    static FORCED(inline) uint64_t calc_mem_size(uint64_t byte_size) {
+        return calc_align_size_based(byte_size, sizeof(void *));
+    }
 #endif

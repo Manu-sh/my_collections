@@ -312,6 +312,7 @@ static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
     return clone;
 }
 
+
 // just like a cpp move: move src into dst.
 static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
@@ -363,8 +364,6 @@ static vector_bit * vector_bit_make_from_cstr(const char *str) {
 
     return self;
 }
-
-
 
 
 #ifdef __cplusplus

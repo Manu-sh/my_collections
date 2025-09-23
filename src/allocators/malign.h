@@ -6,7 +6,6 @@
 
 // setup_block(user_ptr)
 
-
 /*
     vincoli rispettati:
         - user_pointer punta ad un blocco che è grande un multiplo di alignment
@@ -118,6 +117,7 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
 }
 
+
 void * malign_realloc(void *user_pointer, uint64_t size) {
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
@@ -199,7 +199,6 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
 
     return new_user_pointer;
 }
-
 
 
 void malign_free(void *user_pointer) {

@@ -17,7 +17,6 @@ void test_round_up_to_word() {
 
     //printf("%lu\n", log2fast(0));
 
-
     // sizeof(void *) alignment
     for (int sz = 1; sz <= 8; ++sz)
         REQUIRE(round_up_to_word(sz, AL_WORD) == 8);
@@ -57,14 +56,14 @@ void test_round_up_to_word() {
 
 
 /*
-la potenza di 2 è il vincolo sull'indirizzo
-non sul blocco
-io lo sto facendo anche sulla size del blocco.
+    la potenza di 2 è il vincolo sull'indirizzo
+    non sul blocco
+    io lo sto facendo anche sulla size del blocco.
 
-l'user-block dev'essere grande un multiplo di una w
+    l'user-block dev'essere grande un multiplo di una w
 
- L'indirizzo che restituisci deve dare 0 se fai
-(uintptr_t)mem % sizeof(max_aligned_t)
+    L'indirizzo che restituisci deve dare 0 se fai
+    (uintptr_t)mem % sizeof(max_aligned_t)
  */
 int main() {
 
