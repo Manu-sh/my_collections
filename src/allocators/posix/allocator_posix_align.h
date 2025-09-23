@@ -1,9 +1,13 @@
 #pragma once
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
+    #define _POSIX_C_SOURCE 200112L
+#endif
+
 #include <stddef.h>
 #include <stdint.h>
 #include <stdlib.h>
 
-#include "align_common.h"
+#include "../align_common.h"
 
 typedef struct {
     void *p;

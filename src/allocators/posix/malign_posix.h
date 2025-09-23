@@ -3,8 +3,8 @@
     #define _POSIX_C_SOURCE 200112L
 #endif
 
-#include "align_common.h"
-#include "malign_meta.h"
+#include "../align_common.h"
+#include "../malign_meta.h"
 #include <stdint.h>
 
 #ifndef DEBUG
@@ -23,7 +23,7 @@
 
 // [pointer-metadata][user-memory]
 
-void * malign_alloc(size_t size, posix_alignments alignment) {
+void * malign_posix_alloc(size_t size, posix_alignments alignment) {
 
     // TODO: bisogna per forza allineare un blocco di alignment size in più, di questo blocco bisogna però leggere SOLO gli ultimi 8 byte
 
@@ -80,7 +80,7 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
     );
 }
 
-void * malign_realloc(void *user_pointer, size_t size) {
+void * malign_posix_realloc(void *user_pointer, size_t size) {
 
     // gli ultimi 8 byte di real_block sono un puntatore ai metadati
     malign_metadata **metadata = (malign_metadata **) (
@@ -190,7 +190,7 @@ void * malign_realloc(void *user_pointer, size_t size) {
 }
 
 
-void malign_free(void *user_pointer) {
+void malign_posix_free(void *user_pointer) {
 
     // gli ultimi 8 byte di real_block sono un puntatore ai metadati
     malign_metadata **metadata = (malign_metadata **) (

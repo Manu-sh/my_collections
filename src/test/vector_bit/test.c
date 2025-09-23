@@ -423,20 +423,20 @@ void test_concat_vector_bit() {
 
 
 #define DEBUG
-#include "../../allocators/allocator_posix_align.h"
-#include "../../allocators/malign.h"
+#include "../../allocators/posix/allocator_posix_align.h"
+#include "../../allocators/posix/malign_posix.h"
 
 int main() {
 
 #if 0
     //void *p = malign_alloc(113, AL_WORD);
-    void *p = malign_alloc(113, AL_WORD);
+    void *p = malign_posix_alloc(113, AL_WORD);
     //void *p = malign_alloc(113, AL_EWORD);
 
-    void *tmp = malign_realloc(p, 256000000); // TODO: probabile overflow con questo numero
+    void *tmp = malign_posix_realloc(p, 256000000);
     if (tmp) p = tmp;
 
-    malign_free(p);
+    malign_posix_free(p);
     return 0;
 
     allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
