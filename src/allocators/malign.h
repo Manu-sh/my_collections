@@ -1,7 +1,19 @@
 #pragma once
+#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
+    #define _POSIX_C_SOURCE 200112L
+#endif
+
 #include "align_common.h"
 #include "malign_meta.h"
 #include <stdint.h>
+
+#ifndef DEBUG
+    #define DEBUG
+#endif
+
+#ifdef DEBUG
+    #include <stdio.h>
+#endif
 
 // malign: memory aligned
 
@@ -35,6 +47,11 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
     // setup metadata
     void *const real_block = tmp_block;
     void *const user_pointer = ((uint8_t *)real_block) + malign_blk_size;
+
+    #ifdef DEBUG
+        puts("still alive");
+    #endif
+
 
     // gli ultimi 8 byte di real_block sono un puntatore ai metadati
     malign_metadata **metadata = (malign_metadata **) (
@@ -101,6 +118,10 @@ void * malign_realloc(void *user_pointer, size_t size) {
     void *const new_block = tmp_block;
     void *const new_user_pointer = ((uint8_t *)new_block) + malign_blk_size;
 
+    #ifdef DEBUG
+        puts("still alive");
+    #endif
+
     // TODO: può darsi che basti usare memcpy a diritto
     // setup metadata
 
@@ -113,11 +134,20 @@ void * malign_realloc(void *user_pointer, size_t size) {
     *new_metadata = *metadata;
     (*new_metadata)->user_size = size;
 
+
+    #ifdef DEBUG
+        puts("ready for memcpy");
+    #endif
+
+
+    assert( ((uintptr_t)new_user_pointer) % (*metadata)->user_alignment == 0);
+    assert( ((uintptr_t)user_pointer)     % (*metadata)->user_alignment == 0);
+
     // copy user-data into user_memory
     memcpy(
         __builtin_assume_aligned(new_user_pointer, (*metadata)->user_alignment),
         __builtin_assume_aligned(user_pointer, (*metadata)->user_alignment),
-        (*metadata)->user_size
+        real_size
     );
 
     #ifdef DEBUG

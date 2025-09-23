@@ -29,6 +29,15 @@ typedef struct {
 
 #define VECTOR_BIT_DEFAULT_BIT_CAPACITY 8
 
+//#define BLK_MALLOC(_SZ_) (malloc(_SZ_))
+//#define BLK_REALLOC(_P_, _SZ_) (realloc(_P_, _SZ_))
+//#define BLK_FREE(_P_) (free(_P_))
+
+#include "../allocators/malign.h"
+
+#define BLK_MALLOC(_SZ_) (malign_alloc(_SZ_, AL_WORD))
+#define BLK_REALLOC(_P_, _SZ_) (malign_realloc(_P_, _SZ_))
+#define BLK_FREE(_P_) (malign_free(_P_))
 
 static vector_bit * vector_bit_new() {
 
@@ -38,7 +47,7 @@ static vector_bit * vector_bit_new() {
         return NULL;
 
     self->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
-    if (!(self->v = (uint8_t *)malloc( bytes_required(self->bit_capacity) ))) {
+    if (!(self->v = (uint8_t *)BLK_MALLOC( bytes_required(self->bit_capacity) ))) {
         free(self);
         return NULL;
     }
@@ -49,7 +58,7 @@ static vector_bit * vector_bit_new() {
 
 static void vector_bit_free(vector_bit *self) {
     if (!self) return;
-    free(self->v);
+    BLK_FREE(self->v);
     free(self);
 }
 
@@ -90,9 +99,9 @@ static bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
     if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
-        // puts("doubling");
+        //puts("doubling");
         const uint64_t new_byte_capacity = bytes_required(self->bit_capacity * 2); // doubling the bit capacity
-        uint8_t *const nv = (uint8_t *)realloc(self->v, new_byte_capacity);
+        uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, new_byte_capacity);
         if (UNLIKELY(!nv)) return false;
 
         self->v = nv;
@@ -115,7 +124,7 @@ bool vector_bit_pop(vector_bit *self) {
     if (UNLIKELY(self->bit_capacity/16 > self->bit_idx)) {
         // puts("halving");
         const uint64_t byte_capacity = bytes_required(self->bit_capacity / 2); // halving the bit capacity
-        uint8_t *const nv = (uint8_t *)realloc(self->v, byte_capacity);
+        uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, byte_capacity);
         if (UNLIKELY(!nv)) return ret; /* do nothing */
 
         self->v = nv;
@@ -134,7 +143,7 @@ static FORCED(inline) void vector_bit_fast_pop(vector_bit *self) {
 static bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 
     const uint64_t byte_capacity = bytes_required(bit_len);
-    uint8_t *const nv = (uint8_t *)realloc(self->v, byte_capacity);
+    uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, byte_capacity);
     if (UNLIKELY(!nv)) return false;
 
     self->v = nv;
@@ -148,7 +157,7 @@ static bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 static bool vector_bit_shrink_to_fit(vector_bit *self) {
 
     const uint64_t new_byte_capacity = bytes_required(self->bit_idx+1);
-    uint8_t *const nv = (uint8_t *)realloc(self->v, new_byte_capacity);
+    uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, new_byte_capacity);
     if (UNLIKELY(!nv)) return false;
     self->bit_capacity = new_byte_capacity * 8;
     return true;
@@ -310,7 +319,7 @@ static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
         goto src_reset;
     }
 
-    free(dst->v); // free the current dst buffer
+    BLK_FREE(dst->v); // free the current dst buffer
 
     dst->v            = src->v;
     dst->bit_idx      = src->bit_idx;
@@ -321,7 +330,7 @@ static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
     // leave the moved vector in a properly stat
     src->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
-    src->v = (uint8_t *)malloc( bytes_required(src->bit_capacity) );
+    src->v = (uint8_t *)BLK_MALLOC( bytes_required(src->bit_capacity) );
     src->bit_idx = 0;
     assert(src->v);
 }

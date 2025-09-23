@@ -428,7 +428,7 @@ void test_concat_vector_bit() {
 
 int main() {
 
-
+#if 0
     //void *p = malign_alloc(113, AL_WORD);
     void *p = malign_alloc(113, AL_WORD);
     //void *p = malign_alloc(113, AL_EWORD);
@@ -458,6 +458,7 @@ int main() {
 
     allocator_posix_align_free(al);
     return 0;
+#endif
 
 
     test_vector_bit_from_cstr();
