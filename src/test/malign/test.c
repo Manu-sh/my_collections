@@ -84,6 +84,8 @@ int main() {
         void *p = malign_posix_alloc(113, AL_WORD);
         //void *p = malign_alloc(113, AL_EWORD);
 
+        memset(p, 0xff, 113);
+
         void *tmp = malign_posix_realloc(p, 256000000);
         if (tmp) p = tmp;
 

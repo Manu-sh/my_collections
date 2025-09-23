@@ -23,6 +23,13 @@ malign_metadata * malign_meta_from_user_pointer(void *user_pointer) {
 }
 
 
+// recover the effective size of block pointed by user_pointer
+// TODO: probabilmente conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
+uint64_t malign_meta_user_real_size(const malign_metadata *self) {
+    return round_up_to_word(self->user_size, (posix_alignments)self->user_alignment);
+}
+
+
 malign_metadata * malign_meta_new(uint64_t user_size, posix_alignments user_alignment, uint8_t offset) {
 
     malign_metadata *self;
@@ -36,6 +43,7 @@ malign_metadata * malign_meta_new(uint64_t user_size, posix_alignments user_alig
 
     return self;
 }
+
 
 void malign_meta_free(malign_metadata *self) {
     free(self);

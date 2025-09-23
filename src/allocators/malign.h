@@ -12,7 +12,8 @@
         - user_pointer punta ad un blocco che è grande un multiplo di alignment
         - user_pointer è un'indirizzo multiplo di alignment
 
-        - user_pointer - sizeof(void *) è sempre accessibile ed è un puntatore
+        - user_pointer - sizeof(void *) è sempre accessibile ed è un puntatore,
+           siccome ho bisogno di poterne modificare l'indirizzo devo però trattarlo come doppio puntatore
 
 */
 
@@ -68,6 +69,7 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
         printf("%s user-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, (*metadata)->user_alignment);
         printf("%s user-block-size: %lu\n", __func__, (*metadata)->user_size);
+        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(*metadata));
         printf("%s offset: %hu\n", __func__, (*metadata)->offset);
         puts("");
     #endif
@@ -96,6 +98,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s user-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s user-block-size: %lu\n", __func__, metadata->user_size);
+        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
     #endif
@@ -135,7 +138,8 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     memcpy(
         __builtin_assume_aligned(new_user_pointer, metadata->user_alignment),
         __builtin_assume_aligned(user_pointer, metadata->user_alignment),
-        metadata->user_size
+        //metadata->user_size
+        malign_meta_user_real_size(metadata)
     );
 
     free(real_block);
@@ -150,6 +154,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s new-user-block-address: %p\n", __func__, new_user_pointer);
         printf("%s new-user-block-alignment: %hu\n", __func__, (*new_metadata)->user_alignment);
         printf("%s new-user-block-size: %lu\n", __func__, (*new_metadata)->user_size);
+        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(*new_metadata));
         printf("%s new-offset: %hu\n", __func__, (*new_metadata)->offset);
         puts("");
     #endif
@@ -173,6 +178,7 @@ void malign_free(void *user_pointer) {
         printf("%s user-address: %p\n", __func__, user_pointer);
         printf("%s user-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s user-size: %lu\n", __func__, metadata->user_size);
+        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
     #endif
