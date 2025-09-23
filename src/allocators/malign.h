@@ -147,8 +147,15 @@ void * malign_realloc(void *user_pointer, size_t size) {
     memcpy(
         __builtin_assume_aligned(new_user_pointer, (*metadata)->user_alignment),
         __builtin_assume_aligned(user_pointer, (*metadata)->user_alignment),
-        real_size
+        (*metadata)->user_size
     );
+
+    /*
+    memmove(
+            new_user_pointer,
+            user_pointer,
+            (*metadata)->user_size
+    );*/
 
     #ifdef DEBUG
         printf("%s new-block-address: %p\n", __func__, new_block);
