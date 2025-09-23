@@ -14,10 +14,49 @@
 
         - user_pointer - sizeof(void *) è sempre accessibile ed è un puntatore,
            siccome ho bisogno di poterne modificare l'indirizzo devo però trattarlo come doppio puntatore
-
 */
 
 // TODO: non fa il check dell'overflow sulle moltiplicazioni
+
+static FORCED(inline) malign_metadata ** get_meta(void *user_pointer) {
+
+    // gli 8 byte prima di user_pointer sono un puntatore ai metadati
+    malign_metadata **metadata = (malign_metadata **) (
+        ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
+    );
+
+    assert(metadata);
+    return metadata;
+}
+
+// recover the effective size of block pointed by user_pointer
+// TODO: probabilmente conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
+static FORCED(inline) uint64_t user_block_aligned_size(const malign_metadata *metadata) {
+    return malign_meta_aligned_size(metadata);
+}
+
+static FORCED(inline) void * get_real_block(const malign_metadata *metadata, void *user_pointer) {
+    return ((uint8_t *)user_pointer) - metadata->offset;
+}
+
+static FORCED(inline) uint64_t get_real_block_size(const malign_metadata *metadata, void *user_pointer) {
+    const uint8_t *const end = (((uint8_t *)user_pointer) + user_block_aligned_size(metadata));
+    const uint8_t *const beg = ((uint8_t *)get_real_block(metadata, user_pointer));
+    return ((uintptr_t)end) - ((uintptr_t)beg);
+}
+
+// calcola l'offset dell'user_pointer rispetto a real_block perché l'indirizzo abbia un dato allineamento metadata->alignment
+// void *user_pointer = real_block + offset;
+static FORCED(inline) uint8_t calc_offset(void *real_block, uint8_t alignment) {
+    // TODO: provare a ottimizzare % sarà una potenza di 2: a%b -> a&(b-1)
+    return alignment - (
+        ((uintptr_t)real_block) % alignment
+    );
+}
+
+static FORCED(inline) void * get_user_block(void *real_block, uint8_t alignment) {
+    return ((uint8_t *)real_block) + calc_offset(real_block, alignment);
+}
 
 // [pointer-metadata][user-memory]
 void * malign_alloc(uint64_t size, posix_alignments alignment) {
@@ -36,11 +75,7 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
     // how many bytes i have to skip to have an address which is multiple of alignment
     // questo valore va salvato, non posso sapere quanti byte ho skippato
-    const uint8_t offset = alignment - (
-        ((uintptr_t)real_block) % alignment
-    );
-
-    void *user_pointer = (void *)(real_block + offset);
+    void *user_pointer = get_user_block(real_block, alignment);
 
     // TODO: tecnicamente allineando a 8 non è possibile neanche usare SSE, quindi 8 come valore non ha molto senso
     assert( ((uintptr_t)((uint8_t *)user_pointer)) % alignment == 0); // ensure the pointer is properly aligned
@@ -48,18 +83,20 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
     #ifdef DEBUG
         printf("%s real-block-address: %p\n", __func__, real_block);
         printf("%s user-block-address: %p\n", __func__, user_pointer);
-        printf("%s offset=%hu\n", __func__, offset);
+        printf("%s offset=%hu\n", __func__, calc_offset(real_block, alignment));
     #endif
 
     // ensure the block of memory is also aligned
     assert( (((uint8_t *)user_pointer) + round_up_to_word(size, alignment)) <= (real_block + real_size) );
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
-    malign_metadata **metadata = (malign_metadata **) (
-        ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
-    );
+    malign_metadata *x = malign_meta_new(size, alignment, calc_offset(real_block, alignment));
+    if (UNLIKELY(!x)) {
+        free(real_block);
+        return NULL;
+    }
 
-    malign_metadata *x = malign_meta_new(size, alignment, offset);
+    malign_metadata **metadata = get_meta(user_pointer);
     *metadata = x;
 
     #ifdef DEBUG
@@ -69,7 +106,7 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
         printf("%s user-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, (*metadata)->user_alignment);
         printf("%s user-block-size: %lu\n", __func__, (*metadata)->user_size);
-        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(*metadata));
+        printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(*metadata));
         printf("%s offset: %hu\n", __func__, (*metadata)->offset);
         puts("");
     #endif
@@ -81,16 +118,15 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
 }
 
-
 void * malign_realloc(void *user_pointer, uint64_t size) {
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
-    const malign_metadata *metadata = (const malign_metadata *)malign_meta_from_user_pointer(user_pointer);
+    const malign_metadata *metadata = *get_meta(user_pointer);
     if (UNLIKELY(size == metadata->user_size))
         return user_pointer;
 
     // get the begging of the block
-    void *real_block = ((uint8_t *)user_pointer) - metadata->offset;
+    void *real_block = get_real_block(metadata, user_pointer);
 
     #ifdef DEBUG
         printf("%s real-block-address: %p\n", __func__, real_block);
@@ -98,11 +134,10 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s user-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s user-block-size: %lu\n", __func__, metadata->user_size);
-        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
+        printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
     #endif
-
 
     // il vecchio blocco va liberato se cambia ma i metadati no
     // non posso usare realloc() perché può ritornare un indirizzo completamente diverso e a quel punto è inutile che abbia chiamato realloc()
@@ -120,39 +155,27 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     if (UNLIKELY(!new_block))
         return NULL;
 
-    // TODO: creare una funzione setup_block()
-    uint8_t new_offset = metadata->user_alignment - (
-        ((uintptr_t)new_block) % metadata->user_alignment
-    );
-
+    uint8_t new_offset = calc_offset(new_block, metadata->user_alignment);
     void *new_user_pointer = (void *)(new_block + new_offset);
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
-    malign_metadata **new_metadata = (malign_metadata **) (
-        ((uint8_t *)new_user_pointer) - sizeof(malign_metadata **)
-    );
-
-    // move the ownership of metadata pointer
-    *new_metadata = (malign_metadata *)metadata; // remove the const qualifier, im the ownership now
+    malign_metadata **new_metadata = get_meta(new_user_pointer);
+    *new_metadata = (malign_metadata *)metadata; // assign metadata the pointer address and remove the const qualifier, im the ownership now
 
     #ifdef DEBUG
         printf("%s src-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s src-block-size: %lu\n", __func__, metadata->user_size);
-        printf("%s src-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
-
+        printf("%s src-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s new-block-real-size: %lu\n", __func__, new_size);
     #endif
-
-    // TODO: prendere min(a, b)
 
     // copy user-data into user_memory
     memcpy(
         __builtin_assume_aligned(new_user_pointer, metadata->user_alignment),
         __builtin_assume_aligned(user_pointer, metadata->user_alignment),
-        //metadata->user_size
-        MIN( // TODO: migliorare sta roba: round_up_to_word(size, (posix_alignments)metadata->user_alignment)
-            malign_meta_user_real_size(metadata),
+        MIN( // metadata->user_size
+            user_block_aligned_size(metadata),
             new_user_block_real_size
         )
     );
@@ -169,7 +192,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s new-user-block-address: %p\n", __func__, new_user_pointer);
         printf("%s new-user-block-alignment: %hu\n", __func__, (*new_metadata)->user_alignment);
         printf("%s new-user-block-size: %lu\n", __func__, (*new_metadata)->user_size);
-        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(*new_metadata));
+        printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(*new_metadata));
         printf("%s new-offset: %hu\n", __func__, (*new_metadata)->offset);
         puts("");
     #endif
@@ -182,10 +205,11 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
 void malign_free(void *user_pointer) {
 
     // gli ultimi 8 byte di real_block sono un puntatore ai metadati
-    malign_metadata *metadata = (malign_metadata *)malign_meta_from_user_pointer(user_pointer);
+    malign_metadata *metadata = *get_meta(user_pointer);
 
     // move the user pointer back to the begging of the block
-    void *real_block = ((uint8_t *)user_pointer) - metadata->offset;
+    //void *real_block = ((uint8_t *)user_pointer) - metadata->offset;
+    void *real_block = get_real_block(metadata, user_pointer);
 
     #ifdef DEBUG
         printf("%s block-address: %p\n", __func__, real_block);
@@ -193,7 +217,7 @@ void malign_free(void *user_pointer) {
         printf("%s user-address: %p\n", __func__, user_pointer);
         printf("%s user-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s user-size: %lu\n", __func__, metadata->user_size);
-        printf("%s user-block-real-size: %lu\n", __func__, malign_meta_user_real_size(metadata));
+        printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
     #endif

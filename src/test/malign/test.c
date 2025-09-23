@@ -11,7 +11,6 @@
 #endif
 
 #define DEBUG
-#include "../../allocators/posix/allocator_posix_align.h"
 #include "../../allocators/malign.h"
 
 void test_round_up_to_word() {
@@ -72,11 +71,9 @@ int main() {
 
     test_round_up_to_word();
 
-    void *p = malign_alloc(sizeof(long double), AL_DWORD);
-    //void *tmp = malign_realloc(p, 12);
-    //if (tmp) p = tmp;
-    p = p;
-    assert((uintptr_t)p % sizeof(long double) == 0);
+    void *p = malign_alloc(113, AL_DWORD);
+    void *tmp = malign_realloc(p, 12);
+    if (tmp) p = tmp;
 
     malign_free(p);
     return 0;

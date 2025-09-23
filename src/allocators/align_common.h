@@ -38,6 +38,7 @@ static FORCED(inline) uint64_t round_up(uint64_t size, uint64_t align) {
      return (index / align + 1) * align;
 }
 
+#if 0
 // a number where index is accessible and that number is multiple of align and a pow of 2
 // this function is used to round_up a memory block and meet the posix_memalign() requirements
 static FORCED(inline) uint64_t calc_align_index_based(uint64_t index, uint64_t align) {
@@ -55,3 +56,4 @@ static FORCED(inline) uint64_t calc_align_size_based(uint64_t byte_size, uint64_
 static FORCED(inline) uint64_t calc_mem_size(uint64_t byte_size) {
     return calc_align_size_based(byte_size, sizeof(void *));
 }
+#endif
