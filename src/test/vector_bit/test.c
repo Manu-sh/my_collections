@@ -428,12 +428,12 @@ void test_concat_vector_bit() {
 
 int main() {
 
-#if 0
+#if 1
     //void *p = malign_alloc(113, AL_WORD);
     void *p = malign_alloc(113, AL_WORD);
     //void *p = malign_alloc(113, AL_EWORD);
 
-    void *tmp = malign_realloc(p, 12);
+    void *tmp = malign_realloc(p, 256000000); // TODO: probabile overflow con questo numero
     if (tmp) p = tmp;
 
     malign_free(p);

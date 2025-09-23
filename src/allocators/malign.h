@@ -58,13 +58,17 @@ void * malign_alloc(size_t size, posix_alignments alignment) {
             ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
     );
 
-    *metadata = malign_meta_new(size, alignment);
+	malign_metadata *x = malign_meta_new(size, alignment);
+    *metadata = x;
     //*metadata = (malign_metadata *)(uintptr_t)0xdeadbeef;
 
     #ifdef DEBUG
         printf("%s block-address: %p\n", __func__, real_block);
+        printf("%s meta-address-x: %p\n", __func__, (void *)x);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
+        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
 
@@ -93,6 +97,8 @@ void * malign_realloc(void *user_pointer, size_t size) {
         printf("%s block-address: %p\n", __func__, real_block);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
+        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
 
@@ -118,6 +124,8 @@ void * malign_realloc(void *user_pointer, size_t size) {
     void *const new_block = tmp_block;
     void *const new_user_pointer = ((uint8_t *)new_block) + malign_blk_size;
 
+    assert(new_user_pointer > new_block);
+
     #ifdef DEBUG
         puts("still alive");
     #endif
@@ -137,30 +145,44 @@ void * malign_realloc(void *user_pointer, size_t size) {
 
     #ifdef DEBUG
         puts("ready for memcpy");
+        printf("%s malign blk size %lu\n", __func__, malign_blk_size);
+        printf("%s old-user-address: %p\n", __func__, user_pointer);
+        printf("%s new-block-address: %p\n", __func__, new_block);
+        printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
+        printf("%s new-user-address: %p\n", __func__, new_user_pointer);
+        printf("%s new_metadata-user-alignment: %lu\n", __func__, (*new_metadata)->user_alignment);
+        printf("%s new_metadata-user-size: %lu\n", __func__, (*new_metadata)->user_size);
+        puts("");
     #endif
-
 
     assert( ((uintptr_t)new_user_pointer) % (*metadata)->user_alignment == 0);
     assert( ((uintptr_t)user_pointer)     % (*metadata)->user_alignment == 0);
 
+    assert( ((uintptr_t)new_user_pointer) % (*new_metadata)->user_alignment == 0);
+    assert( ((uintptr_t)user_pointer)     % (*new_metadata)->user_alignment == 0);
+
     // copy user-data into user_memory
+    /*
     memcpy(
         __builtin_assume_aligned(new_user_pointer, (*metadata)->user_alignment),
         __builtin_assume_aligned(user_pointer, (*metadata)->user_alignment),
-        (*metadata)->user_size
+        (*new_metadata)->user_size
     );
+    */
 
-    /*
+
     memmove(
             new_user_pointer,
             user_pointer,
-            (*metadata)->user_size
-    );*/
+            (*new_metadata)->user_size
+    );
 
     #ifdef DEBUG
         printf("%s new-block-address: %p\n", __func__, new_block);
         printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
         printf("%s new-user-address: %p\n", __func__, new_user_pointer);
+        printf("%s new_metadata-user-alignment: %lu\n", __func__, (*new_metadata)->user_alignment);
+        printf("%s new_metadata-user-size: %lu\n", __func__, (*new_metadata)->user_size);
         puts("");
     #endif
 
@@ -183,6 +205,8 @@ void malign_free(void *user_pointer) {
         printf("%s block-address: %p\n", __func__, real_block);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
+        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
 
