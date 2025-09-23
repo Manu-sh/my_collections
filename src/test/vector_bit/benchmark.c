@@ -36,7 +36,6 @@ int main() {
     assert(vector_bit_capacity(vct) >= 8);
     */
 
-
     vector_bit_free(vct);
     return 0;
 }

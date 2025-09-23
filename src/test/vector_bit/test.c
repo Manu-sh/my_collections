@@ -421,45 +421,7 @@ void test_concat_vector_bit() {
     }
 }
 
-
-#define DEBUG
-#include "../../allocators/posix/allocator_posix_align.h"
-#include "../../allocators/posix/malign_posix.h"
-
 int main() {
-
-#if 0
-    //void *p = malign_alloc(113, AL_WORD);
-    void *p = malign_posix_alloc(113, AL_WORD);
-    //void *p = malign_alloc(113, AL_EWORD);
-
-    void *tmp = malign_posix_realloc(p, 256000000);
-    if (tmp) p = tmp;
-
-    malign_posix_free(p);
-    return 0;
-
-    allocator_posix_align *al = allocator_posix_align_new(120, AL_WORD);
-
-    printf("alignment: %u\n", al->alignment);
-    printf("size: %lu\n", al->size);
-    printf("p: %p\n", al->p);
-
-    allocator_posix_align_grow(al, 1020);
-    printf("alignment: %u\n", al->alignment);
-    printf("size: %lu\n", al->size);
-    printf("p: %p\n", al->p);
-
-
-    allocator_posix_align_shrink(al, 712);
-    printf("alignment: %u\n", al->alignment);
-    printf("size: %lu\n", al->size);
-    printf("p: %p\n", al->p);
-
-    allocator_posix_align_free(al);
-    return 0;
-#endif
-
 
     test_vector_bit_from_cstr();
     test_concat_vector_bit();

@@ -11,9 +11,6 @@
     //#define DEBUG
 #endif
 
-#ifdef DEBUG
-    #include <stdio.h>
-#endif
 
 // malign: memory aligned
 
@@ -31,7 +28,7 @@ void * malign_posix_alloc(size_t size, posix_alignments alignment) {
     const uint64_t malign_blk_size = alignment;
 
     uint64_t real_size = malign_blk_size + size;   // reserve size for metadata
-    real_size = calc_align_size_based(real_size, alignment); // -1 because real_size is not an index and doesn't require to be accessible
+    real_size = calc_align_size_based(real_size, alignment);
 
     #ifdef DEBUG
         printf("%s ask for blk size %lu\n", __func__, real_size);

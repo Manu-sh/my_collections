@@ -1,5 +1,14 @@
 #pragma once
 
+#ifdef DEBUG
+    #ifndef __cplusplus
+        #include <stdio.h>
+    #else
+        #include <cstdio>
+    #endif
+#endif
+
+
 #ifdef FORCED
     #ifndef __cplusplus // #warning is cpp23 feature :/
         #warning "FORCED() macro already defined, inline may not performed"

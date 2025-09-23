@@ -29,15 +29,14 @@ typedef struct {
 
 #define VECTOR_BIT_DEFAULT_BIT_CAPACITY 8
 
-//#define BLK_MALLOC(_SZ_) (malloc(_SZ_))
-//#define BLK_REALLOC(_P_, _SZ_) (realloc(_P_, _SZ_))
-//#define BLK_FREE(_P_) (free(_P_))
+#define BLK_MALLOC(_SZ_) (malloc(_SZ_))
+#define BLK_REALLOC(_P_, _SZ_) (realloc(_P_, _SZ_))
+#define BLK_FREE(_P_) (free(_P_))
 
-#include "../allocators/posix/malign_posix.h"
-
-#define BLK_MALLOC(_SZ_) (malign_posix_alloc(_SZ_, AL_QWORD))
-#define BLK_REALLOC(_P_, _SZ_) (malign_posix_realloc(_P_, _SZ_))
-#define BLK_FREE(_P_) (malign_posix_free(_P_))
+//#include "../allocators/posix/malign_posix.h"
+//#define BLK_MALLOC(_SZ_) (malign_posix_alloc(_SZ_, AL_QWORD))
+//#define BLK_REALLOC(_P_, _SZ_) (malign_posix_realloc(_P_, _SZ_))
+//#define BLK_FREE(_P_) (malign_posix_free(_P_))
 
 static vector_bit * vector_bit_new() {
 
