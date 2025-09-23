@@ -5,7 +5,8 @@
 
 // log2 for n which must be a pow of 2
 static FORCED(inline) uint64_t log2fast(uint64_t n_pow_of_2) {
-    return 63 - __builtin_clzll(n_pow_of_2);
+    //return 63 - __builtin_clzll(n_pow_of_2);
+    return 64 - __builtin_clzll(n_pow_of_2 - !!n_pow_of_2); // questa versione è più tollerante nel caso in cui n_pow_of_2 dovesse essere 0
 }
 
 typedef enum {
@@ -22,7 +23,8 @@ static FORCED(inline) uint64_t round_up_to_word(uint64_t size, posix_alignments 
     assert(size && align);
 
     uint64_t index = size - 1; // TODO: cambiare in size - !!size
-    const uint64_t log2 = log2fast(align); // printf("log2(%d)=%lu\n", align, log2);
+    const uint64_t log2 = log2fast(align);
+    //printf("log2(%d)=%lu\n", align, log2);
     return ((index >> log2) + 1) << log2; // same of: return (index / align + 1) * align; when align is a pow of 2
 }
 

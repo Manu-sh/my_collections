@@ -50,9 +50,9 @@ void * malign_posix_alloc(size_t size, posix_alignments alignment) {
     #endif
 
 
-    // gli ultimi 8 byte di real_block sono un puntatore ai metadati
+    // gli 8 byte prima di user_pointer sono un puntatore ai metadati
     malign_metadata **metadata = (malign_metadata **) (
-            ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
+        ((uint8_t *)user_pointer) - sizeof(malign_metadata **)
     );
 
 	malign_metadata *x = malign_meta_new(size, alignment);
@@ -64,7 +64,7 @@ void * malign_posix_alloc(size_t size, posix_alignments alignment) {
         printf("%s meta-address-x: %p\n", __func__, (void *)x);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
-        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-alignment: %hu\n", __func__, (*metadata)->user_alignment);
         printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
@@ -94,7 +94,7 @@ void * malign_posix_realloc(void *user_pointer, size_t size) {
         printf("%s block-address: %p\n", __func__, real_block);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
-        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-alignment: %hu\n", __func__, (*metadata)->user_alignment);
         printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
@@ -130,7 +130,7 @@ void * malign_posix_realloc(void *user_pointer, size_t size) {
     // TODO: può darsi che basti usare memcpy a diritto
     // setup metadata
 
-    // gli ultimi 8 byte di real_block sono un puntatore ai metadati
+    // gli 8 byte prima di user_pointer sono un puntatore ai metadati
     malign_metadata **new_metadata = (malign_metadata **) (
         ((uint8_t *)new_user_pointer) - sizeof(malign_metadata **)
     );
@@ -146,7 +146,7 @@ void * malign_posix_realloc(void *user_pointer, size_t size) {
         printf("%s new-block-address: %p\n", __func__, new_block);
         printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
         printf("%s new-user-address: %p\n", __func__, new_user_pointer);
-        printf("%s new_metadata-user-alignment: %lu\n", __func__, (*new_metadata)->user_alignment);
+        printf("%s new_metadata-user-alignment: %hu\n", __func__, (*new_metadata)->user_alignment);
         printf("%s new_metadata-user-size: %lu\n", __func__, (*new_metadata)->user_size);
         puts("");
     #endif
@@ -177,7 +177,7 @@ void * malign_posix_realloc(void *user_pointer, size_t size) {
         printf("%s new-block-address: %p\n", __func__, new_block);
         printf("%s new-meta-address: %p\n", __func__, (void *)*new_metadata);
         printf("%s new-user-address: %p\n", __func__, new_user_pointer);
-        printf("%s new_metadata-user-alignment: %lu\n", __func__, (*new_metadata)->user_alignment);
+        printf("%s new_metadata-user-alignment: %hu\n", __func__, (*new_metadata)->user_alignment);
         printf("%s new_metadata-user-size: %lu\n", __func__, (*new_metadata)->user_size);
         puts("");
     #endif
@@ -201,7 +201,7 @@ void malign_posix_free(void *user_pointer) {
         printf("%s block-address: %p\n", __func__, real_block);
         printf("%s meta-address: %p\n", __func__, (void *)*metadata);
         printf("%s user-address: %p\n", __func__, user_pointer);
-        printf("%s user-alignment: %lu\n", __func__, (*metadata)->user_alignment);
+        printf("%s user-alignment: %hu\n", __func__, (*metadata)->user_alignment);
         printf("%s user-size: %lu\n", __func__, (*metadata)->user_size);
         puts("");
     #endif
