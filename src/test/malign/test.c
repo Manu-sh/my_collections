@@ -76,6 +76,7 @@ int main() {
     void *tmp = malign_realloc(p, 12);
     if (tmp) p = tmp;
 
+    malign_free(p);
     return 0;
 
     #if 0

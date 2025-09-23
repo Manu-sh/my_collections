@@ -154,3 +154,27 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
 
     return new_user_pointer;
 }
+
+
+
+void malign_free(void *user_pointer) {
+
+    // gli ultimi 8 byte di real_block sono un puntatore ai metadati
+    malign_metadata *metadata = (malign_metadata *)malign_meta_from_user_pointer(user_pointer);
+
+    // move the user pointer back to the begging of the block
+    void *real_block = ((uint8_t *)user_pointer) - metadata->offset;
+
+    #ifdef DEBUG
+        printf("%s block-address: %p\n", __func__, real_block);
+        printf("%s meta-address: %p\n", __func__, (void *)metadata);
+        printf("%s user-address: %p\n", __func__, user_pointer);
+        printf("%s user-alignment: %hu\n", __func__, metadata->user_alignment);
+        printf("%s user-size: %lu\n", __func__, metadata->user_size);
+        printf("%s offset: %hu\n", __func__, metadata->offset);
+        puts("");
+    #endif
+
+    malign_meta_free(metadata); // bye :(
+    free(real_block);
+}
