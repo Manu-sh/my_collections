@@ -14,7 +14,6 @@
 
         - user_pointer - sizeof(void *) è sempre accessibile ed è un puntatore
 
-          TODO: probabilmente va usato un puntatore singolo e non doppio
 */
 
 // TODO: non fa il check dell'overflow sulle moltiplicazioni
