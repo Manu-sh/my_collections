@@ -139,6 +139,12 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     if (UNLIKELY(size == metadata->user_size))
         return user_pointer;
 
+    // TODO: anche se size < get_user_block_aligned_size() e size > (metadata->user_size) non bisogna fare niente eccetto aggiornare user_size
+    if (size > metadata->user_size && size < get_user_block_aligned_size(user_pointer)) {
+        ((malign_metadata *)metadata)->user_size = size; // edit the user_size
+        return user_pointer;
+    }
+
     // get the begging of the block
     void *real_block = get_real_block(metadata, user_pointer);
 
