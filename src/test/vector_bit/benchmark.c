@@ -6,6 +6,8 @@
     #define EXTRAS
 #endif
 
+#define TEST 1
+
 #include "../../vector_bit/vector_bit.h"
 #include <stdio.h>
 

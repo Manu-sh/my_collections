@@ -63,6 +63,11 @@ static FORCED(inline) void * get_user_block(void *real_block, uint8_t alignment)
     return ((uint8_t *)real_block) + calc_offset(real_block, alignment);
 }
 
+
+static FORCED(inline) uint64_t get_user_block_aligned_size(void *user_pointer) {
+    return user_block_aligned_size(*get_meta(user_pointer));
+}
+
 // [pointer-metadata][user-memory]
 void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
@@ -115,6 +120,8 @@ void * malign_alloc(uint64_t size, posix_alignments alignment) {
         printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(*metadata));
         printf("%s offset: %hu\n", __func__, (*metadata)->offset);
         puts("");
+
+        assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(*metadata));
     #endif
 
     return __builtin_assume_aligned(
@@ -144,6 +151,8 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
+
+        assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(metadata));
     #endif
 
     // il vecchio blocco va liberato se cambia ma i metadati no
@@ -175,6 +184,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s src-block-size: %lu\n", __func__, metadata->user_size);
         printf("%s src-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s new-block-real-size: %lu\n", __func__, new_size);
+        assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(metadata));
     #endif
 
     // copy user-data into user_memory
@@ -202,6 +212,8 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(*new_metadata));
         printf("%s new-offset: %hu\n", __func__, (*new_metadata)->offset);
         puts("");
+        assert(get_user_block_aligned_size(new_user_pointer) == user_block_aligned_size(*new_metadata));
+        //assert(0);
     #endif
 
     return new_user_pointer;
@@ -226,6 +238,7 @@ void malign_free(void *user_pointer) {
         printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
+        assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(metadata));
     #endif
 
     malign_meta_free(metadata); // bye :(
