@@ -13,6 +13,10 @@
 #define DEBUG
 #include "../../allocators/malign.h"
 
+
+#include <stdlib.h>
+#include <time.h>
+
 void test_round_up_to_word() {
 
     //printf("%lu\n", log2fast(0));
@@ -56,6 +60,7 @@ void test_round_up_to_word() {
 
 void test_align_malign_pointer_logic() {
 
+    srand(time(0));
 
     const posix_alignment p_aligns[] = {
             AL_WORD,
@@ -66,16 +71,17 @@ void test_align_malign_pointer_logic() {
 
     for (uintptr_t p = 1; p < 1000; ++p) {
         for (unsigned i = 0; i < sizeof p_aligns / sizeof(*p_aligns); ++i) {
+
+            const uint64_t user_size = rand() % 256 + 1;
             const posix_alignment alignment = p_aligns[i];
-            const uint64_t aligned_size = round_up_to_word(1, alignment);
+            const uint64_t aligned_size = round_up_to_word(user_size, alignment);
             const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
             const uint64_t real_size = malign_block + alignment + aligned_size;
             const uint64_t offset = malign_block + (alignment - (p % alignment));
 
-            //printf("p=%zu real_size=%zu malign_blk=%zu aligned_size=%zu offset=%zu\n", p, real_size, malign_block, aligned_size, offset);
+            printf("p=%zu real_size=%zu malign_blk=%zu aligned_size=%zu offset=%zu\n", p, real_size, malign_block, aligned_size, offset);
 
             uintptr_t user_address = p + offset;
-
             assert(user_address % alignment == 0); // address is aligned
             assert(user_address + aligned_size <= p + real_size);
             assert(user_address - malign_block >= p); // ensure i can read the metadata section
@@ -97,7 +103,6 @@ void test_align_malign_pointer_logic() {
     (uintptr_t)mem % sizeof(max_aligned_t)
  */
 
-#include <stdlib.h>
 int main(int argc, char *argv[]) {
 
     test_round_up_to_word();
