@@ -209,7 +209,10 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s new-user-block-address: %p\n", __func__, new_user_pointer);
         printf("%s new-user-block-alignment: %hu\n", __func__, (*new_metadata)->user_alignment);
         printf("%s new-user-block-size: %lu\n", __func__, (*new_metadata)->user_size);
+
+        //printf("%s user-block-real-size: %lu\n", __func__, get_user_block_aligned_size(new_user_pointer));
         printf("%s user-block-real-size: %lu\n", __func__, user_block_aligned_size(*new_metadata));
+
         printf("%s new-offset: %hu\n", __func__, (*new_metadata)->offset);
         puts("");
         assert(get_user_block_aligned_size(new_user_pointer) == user_block_aligned_size(*new_metadata));
