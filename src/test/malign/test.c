@@ -65,12 +65,17 @@ void test_round_up_to_word() {
     L'indirizzo che restituisci deve dare 0 se fai
     (uintptr_t)mem % sizeof(max_aligned_t)
  */
-int main() {
+
+#include <stdlib.h>
+int main(int argc, char *argv[]) {
 
     test_round_up_to_word();
 
-    void *p = malign_alloc(113, AL_DWORD);
-    void *tmp = malign_realloc(p, 12);
+    size_t   alloc_user_size = argc > 1 ? atol(argv[1]) : 113;
+    size_t realloc_user_size = argc > 2 ? atol(argv[2]) : 12;
+
+    void *p = malign_alloc(alloc_user_size, AL_WORD);
+    void *tmp = malign_realloc(p, realloc_user_size);
     if (tmp) p = tmp;
 
     malign_free(p);
