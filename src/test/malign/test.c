@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
     size_t   alloc_user_size = argc > 1 ? atol(argv[1]) : 113;
     size_t realloc_user_size = argc > 2 ? atol(argv[2]) : 12;
 
-    void *p = malign_alloc(alloc_user_size, AL_WORD);
+    void *p = malign_alloc(alloc_user_size, AL_EWORD);
     void *tmp = malign_realloc(p, realloc_user_size);
     if (tmp) p = tmp;
 
