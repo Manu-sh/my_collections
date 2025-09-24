@@ -55,6 +55,8 @@ __helper uint8_t calc_offset(void *real_block, uint8_t alignment) {
     );
 }
 
+// TODO: bug con l'artimetica se venisse ritornato un'indirizzo multiplo di 7 ci sarebbe un problema perché
+//  8-((7)%8) = 1 e io devo sempre avere almeno 8 byte liberi a sinistra
 __helper void * get_user_block(void *real_block, uint8_t alignment) {
     return ((uint8_t *)real_block) + calc_offset(real_block, alignment);
 }
