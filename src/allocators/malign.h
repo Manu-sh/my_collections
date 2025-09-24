@@ -35,6 +35,7 @@
         per questo l'helper riporta la size richiesta dall'utente ma allineata.
 
 
+        // TODO: test con 0x01
 
         alignment = 32 byte
 
@@ -54,6 +55,8 @@
     sfruttando .data oppure allocando un blocco grosso con malloc e restituendo indirizzi disallineati
 
 */
+
+
 
 // TODO: non fa il check dell'overflow sulle moltiplicazioni
 
