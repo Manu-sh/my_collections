@@ -93,6 +93,7 @@ int main(int argc, char *argv[]) {
         assert( user_address % alignment == 0); // address is aligned
         assert( user_address + aligned_size <= p + real_size);
         assert( user_address - malign_block >= p); // ensure i can read the metadata section
+        assert( user_address - offset == p);       // ensure i can get the real block from user address
 
     }
 
