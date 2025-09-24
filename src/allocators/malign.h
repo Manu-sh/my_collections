@@ -89,14 +89,14 @@ __helper uint64_t get_real_block_size(const malign_metadata *metadata, void *use
 
 // calcola l'offset dell'user_pointer rispetto a real_block perché l'indirizzo abbia un dato allineamento metadata->alignment
 // void *user_pointer = real_block + offset;
-__helper uint8_t calc_offset(void *real_block, posix_alignments alignment) {
+__helper uint8_t calc_offset(void *real_block, posix_alignment alignment) {
     // alignment will be a pow of 2: a%b -> a&(b-1)
     return round_up_to_word(sizeof(void **), alignment) + (alignment - (
         ((uintptr_t)real_block) & (alignment - 1) // return alignment - ( ((uintptr_t)real_block) % alignment );
     ));
 }
 
-__helper void * get_user_block(void *real_block, posix_alignments alignment) {
+__helper void * get_user_block(void *real_block, posix_alignment alignment) {
     return ((uint8_t *)real_block) + calc_offset(real_block, alignment);
 }
 
@@ -105,7 +105,7 @@ __helper uint64_t get_user_block_aligned_size(void *user_pointer) {
 }
 
 // [opt-padding + pointer-metadata][user-memory][opt-padding]
-void * malign_alloc(uint64_t size, posix_alignments alignment) {
+void * malign_alloc(uint64_t size, posix_alignment alignment) {
 
     assert(alignment >= sizeof(malign_metadata **)); // enough space for metadata pointer
 
@@ -206,7 +206,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     assert(metadata->user_alignment >= sizeof(void **)); // enough space for metadata pointer
 
     // padding + reserved + aligned block: padding is required to move the user_pointer at the right address to be aligned
-    const posix_alignments alignment = (posix_alignments)metadata->user_alignment;
+    const posix_alignment alignment = (posix_alignment)metadata->user_alignment;
     const uint64_t new_real_size = round_up_to_word(sizeof(void **), alignment) + alignment + round_up_to_word(size, alignment);
 
     #ifdef DEBUG
@@ -237,7 +237,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         __builtin_assume_aligned(new_user_pointer, metadata->user_alignment),
         __builtin_assume_aligned(user_pointer, metadata->user_alignment),
         MIN( // metadata->user_size
-            round_up_to_word(metadata->user_size, (posix_alignments)metadata->user_alignment),
+            round_up_to_word(metadata->user_size, (posix_alignment)metadata->user_alignment),
             round_up_to_word(size, alignment)
         )
     );

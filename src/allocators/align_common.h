@@ -17,10 +17,10 @@ typedef enum {
     AL_DWORD    = sizeof(void *) * 2, // 16 byte SSE
     AL_QWORD    = sizeof(void *) * 4, // 32 byte avx2
     AL_EWORD    = sizeof(void *) * 8, // 64 byte alignment avx512
-} posix_alignments;
+} posix_alignment;
 
 
-static FORCED(inline) uint64_t round_up_to_word(uint64_t size, posix_alignments align) {
+static FORCED(inline) uint64_t round_up_to_word(uint64_t size, posix_alignment align) {
 
     assert(size && align);
 

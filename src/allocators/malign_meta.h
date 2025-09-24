@@ -14,10 +14,10 @@ typedef struct __attribute__((__packed__)) {
 // recover the effective size of block pointed by user_pointer
 // TODO: probabilmente conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
 uint64_t malign_meta_aligned_size(const malign_metadata *self) {
-    return round_up_to_word(self->user_size, (posix_alignments)self->user_alignment);
+    return round_up_to_word(self->user_size, (posix_alignment)self->user_alignment);
 }
 
-malign_metadata * malign_meta_new(uint64_t user_size, posix_alignments user_alignment, uint8_t offset) {
+malign_metadata * malign_meta_new(uint64_t user_size, posix_alignment user_alignment, uint8_t offset) {
 
     malign_metadata *self;
 

@@ -54,6 +54,37 @@ void test_round_up_to_word() {
 
 }
 
+void test_align_malign_pointer_logic() {
+
+
+    const posix_alignment p_aligns[] = {
+            AL_WORD,
+            AL_DWORD,
+            AL_QWORD,
+            AL_EWORD
+    };
+
+    for (uintptr_t p = 1; p < 1000; ++p) {
+        for (unsigned i = 0; i < sizeof p_aligns / sizeof(*p_aligns); ++i) {
+            const posix_alignment alignment = p_aligns[i];
+            const uint64_t aligned_size = round_up_to_word(1, alignment);
+            const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
+            const uint64_t real_size = malign_block + alignment + aligned_size;
+            const uint64_t offset = malign_block + (alignment - (p % alignment));
+
+            //printf("p=%zu real_size=%zu malign_blk=%zu aligned_size=%zu offset=%zu\n", p, real_size, malign_block, aligned_size, offset);
+
+            uintptr_t user_address = p + offset;
+
+            assert(user_address % alignment == 0); // address is aligned
+            assert(user_address + aligned_size <= p + real_size);
+            assert(user_address - malign_block >= p); // ensure i can read the metadata section
+            assert(user_address - offset == p);       // ensure i can get the real block from user address
+        }
+    }
+
+}
+
 
 /*
     la potenza di 2 è il vincolo sull'indirizzo
@@ -69,39 +100,11 @@ void test_round_up_to_word() {
 #include <stdlib.h>
 int main(int argc, char *argv[]) {
 
-
     test_round_up_to_word();
+    test_align_malign_pointer_logic();
 
     size_t   alloc_user_size = argc > 1 ? atol(argv[1]) : 113;
     size_t realloc_user_size = argc > 2 ? atol(argv[2]) : 12;
-
-
-    // malign_block + (alignment - ( ((uintptr_t)real_blk) % alignment )) -> 9
-
-    const posix_alignments alignment = AL_QWORD;
-    for (uintptr_t p = 1; p < 1000; ++p) {
-
-        const uint64_t aligned_size = round_up_to_word(1, alignment);
-        const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
-        const uint64_t real_size    = malign_block + alignment + aligned_size;
-        const uint64_t offset       = malign_block + (alignment - (p%alignment));
-
-        printf("p=%zu real_size=%zu malign_blk=%zu aligned_size=%zu offset=%zu\n",
-               p, real_size, malign_block, aligned_size, offset);
-
-        uintptr_t user_address = p + offset;
-        assert( user_address % alignment == 0); // address is aligned
-        assert( user_address + aligned_size <= p + real_size);
-        assert( user_address - malign_block >= p); // ensure i can read the metadata section
-        assert( user_address - offset == p);       // ensure i can get the real block from user address
-
-    }
-
-    // 14 + (alignment - ( ((uintptr_t)real_blk) % alignment )) -> 9
-    printf("%lu\n",
-           32 + AL_QWORD + round_up_to_word(1, AL_QWORD)
-    );
-    //printf("%lu\n", round_up_to_word(alloc_user_size + 8, AL_WORD));
     return 0;
 
     void *p = malign_alloc(alloc_user_size, AL_EWORD);
