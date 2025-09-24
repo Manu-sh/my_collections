@@ -85,13 +85,13 @@ __helper uint64_t user_block_aligned_size(const malign_metadata *metadata) {
     return malign_meta_aligned_size(metadata);
 }
 
-__helper void * get_real_block(const malign_metadata *metadata, void *user_pointer) {
+__helper void * get_real_block(void *user_pointer, const malign_metadata *metadata) {
     return ((uint8_t *)user_pointer) - metadata->offset;
 }
 
-__helper uint64_t get_real_block_size(const malign_metadata *metadata, void *user_pointer) {    // real_block: [opt_pad + metadata + user_block]
+__helper uint64_t get_real_block_size(void *user_pointer, const malign_metadata *metadata) {    // real_block: [opt_pad + metadata + user_block]
     const uint8_t *const end = (((uint8_t *)user_pointer) + user_block_aligned_size(metadata)); // move at the end of user_block which is also the end of real_block
-    const uint8_t *const beg = ((uint8_t *)get_real_block(metadata, user_pointer));             // get the beginning of the real_block
+    const uint8_t *const beg = ((uint8_t *)get_real_block(user_pointer, metadata));             // get the beginning of the real_block
     return ((uintptr_t)end) - ((uintptr_t)beg);
 }
 
@@ -120,9 +120,9 @@ void * malign_alloc(uint64_t size, posix_alignment alignment) {
     // padding + reserved + aligned block: padding is required to move the user_pointer at the right address to be aligned
     const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
     const uint64_t aligned_size = round_up_to_word(size, alignment);
-    const uint64_t real_size = malign_block + alignment + aligned_size;
-    uint8_t *real_block = (uint8_t *)malloc(real_size);
+    const uint64_t real_size    = malign_block + alignment + aligned_size;
 
+    uint8_t *real_block = (uint8_t *)malloc(real_size);
     if (UNLIKELY(!real_block))
         return NULL;
 
@@ -194,7 +194,7 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
     }
 
     // get the begging of the block
-    void *real_block = get_real_block(metadata, user_pointer);
+    void *real_block = get_real_block(user_pointer, metadata);
 
     #ifdef DEBUG
         printf("%s real-block-address: %p\n", __func__, real_block);
@@ -203,10 +203,9 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         printf("%s user-block-alignment: %hu\n", __func__, metadata->user_alignment);
         printf("%s user-block-size: %lu\n", __func__, metadata->user_size);
         printf("%s user-block-aligned-size: %lu\n", __func__, user_block_aligned_size(metadata));
-        printf("%s user-block-real-size: %lu\n", __func__, get_real_block_size(metadata, user_pointer));
+        printf("%s user-block-real-size: %lu\n", __func__, get_real_block_size(user_pointer, metadata));
         printf("%s offset: %hu\n", __func__, metadata->offset);
         puts("");
-
         assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(metadata));
     #endif
 
@@ -284,7 +283,7 @@ void malign_free(void *user_pointer) {
 
     // move the user pointer back to the begging of the block
     //void *real_block = ((uint8_t *)user_pointer) - metadata->offset;
-    void *real_block = get_real_block(metadata, user_pointer);
+    void *real_block = get_real_block(user_pointer, metadata);
 
     #ifdef DEBUG
         printf("%s block-address: %p\n", __func__, real_block);
