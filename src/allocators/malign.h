@@ -4,6 +4,8 @@
 #include "malign_meta.h"
 #include <stdint.h>
 
+#define __helper static FORCED(inline)
+
 // setup_block(user_ptr)
 
 /*
@@ -17,7 +19,7 @@
 
 // TODO: non fa il check dell'overflow sulle moltiplicazioni
 
-static FORCED(inline) malign_metadata ** get_meta(void *user_pointer) {
+__helper malign_metadata ** get_meta(void *user_pointer) {
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
     malign_metadata **metadata = (malign_metadata **) (
@@ -30,45 +32,38 @@ static FORCED(inline) malign_metadata ** get_meta(void *user_pointer) {
 
 // recover the effective size of block pointed by user_pointer
 // TODO: probabilmente conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
-static FORCED(inline) uint64_t user_block_aligned_size(const malign_metadata *metadata) {
+__helper uint64_t user_block_aligned_size(const malign_metadata *metadata) {
     return malign_meta_aligned_size(metadata);
 }
 
-static FORCED(inline) void * get_real_block(const malign_metadata *metadata, void *user_pointer) {
+__helper void * get_real_block(const malign_metadata *metadata, void *user_pointer) {
     return ((uint8_t *)user_pointer) - metadata->offset;
 }
 
-static FORCED(inline) uint64_t get_real_block_size(const malign_metadata *metadata, void *user_pointer) {
-    const uint8_t *const end = (((uint8_t *)user_pointer) + user_block_aligned_size(metadata));
-    const uint8_t *const beg = ((uint8_t *)get_real_block(metadata, user_pointer));
+__helper uint64_t get_real_block_size(const malign_metadata *metadata, void *user_pointer) {    // real_block: [padding+metadata+user_block]
+    const uint8_t *const end = (((uint8_t *)user_pointer) + user_block_aligned_size(metadata)); // move at the end of user_block which is also the end of real_block
+    const uint8_t *const beg = ((uint8_t *)get_real_block(metadata, user_pointer));             // get the beginning of the real_block
     return ((uintptr_t)end) - ((uintptr_t)beg);
 }
 
 // calcola l'offset dell'user_pointer rispetto a real_block perché l'indirizzo abbia un dato allineamento metadata->alignment
 // void *user_pointer = real_block + offset;
-static FORCED(inline) uint8_t calc_offset(void *real_block, uint8_t alignment) {
-    // TODO: provare a ottimizzare % sarà una potenza di 2: a%b -> a&(b-1)
-    /*
+__helper uint8_t calc_offset(void *real_block, uint8_t alignment) {
+    // alignment will be a pow of 2: a%b -> a&(b-1)
     return alignment - (
-        ((uintptr_t)real_block) % alignment
-    );
-     */
-
-    return alignment - (
-        ((uintptr_t)real_block) & (alignment - 1)
+        ((uintptr_t)real_block) & (alignment - 1) // return alignment - ( ((uintptr_t)real_block) % alignment );
     );
 }
 
-static FORCED(inline) void * get_user_block(void *real_block, uint8_t alignment) {
+__helper void * get_user_block(void *real_block, uint8_t alignment) {
     return ((uint8_t *)real_block) + calc_offset(real_block, alignment);
 }
 
-
-static FORCED(inline) uint64_t get_user_block_aligned_size(void *user_pointer) {
+__helper uint64_t get_user_block_aligned_size(void *user_pointer) {
     return user_block_aligned_size(*get_meta(user_pointer));
 }
 
-// [pointer-metadata][user-memory]
+// [padding+pointer-metadata][user-memory]
 void * malign_alloc(uint64_t size, posix_alignments alignment) {
 
     assert(alignment >= sizeof(malign_metadata **)); // enough space for metadata pointer
