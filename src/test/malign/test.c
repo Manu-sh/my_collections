@@ -17,44 +17,44 @@
 #include <stdlib.h>
 #include <time.h>
 
-void test_round_up_to_word() {
+void test_align_size() {
 
     //printf("%lu\n", log2fast(0));
 
     // sizeof(void *) alignment
     for (int sz = 1; sz <= 8; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_WORD) == 8);
+        REQUIRE(align_size(sz, AL_WORD) == 8);
 
     for (int sz = 8+1; sz <= 16; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_WORD) == 16);
+        REQUIRE(align_size(sz, AL_WORD) == 16);
 
     for (int sz = 16+1; sz <= 24; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_WORD) == 24);
+        REQUIRE(align_size(sz, AL_WORD) == 24);
 
 
     // sizeof(void *) * 2 alignment
     for (int sz = 1; sz <= 8; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_DWORD) == 16);
+        REQUIRE(align_size(sz, AL_DWORD) == 16);
 
     for (int sz = 8+1; sz <= 16; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_DWORD) == 16);
+        REQUIRE(align_size(sz, AL_DWORD) == 16);
 
     for (int sz = 16+1; sz <= 24; ++sz)
-        REQUIRE(round_up_to_word(sz, AL_DWORD) == 32);
+        REQUIRE(align_size(sz, AL_DWORD) == 32);
 
 
 
-    REQUIRE(round_up_to_word(113, AL_WORD) == 120);
-    REQUIRE(round_up_to_word(256000000, AL_WORD) == 256000000);
+    REQUIRE(align_size(113, AL_WORD) == 120);
+    REQUIRE(align_size(256000000, AL_WORD) == 256000000);
 
-    REQUIRE(round_up_to_word(113, AL_DWORD) == 128);
-    REQUIRE(round_up_to_word(113, AL_DWORD) == 128);
+    REQUIRE(align_size(113, AL_DWORD) == 128);
+    REQUIRE(align_size(113, AL_DWORD) == 128);
 
-    REQUIRE(round_up_to_word(113, AL_QWORD) == 128);
-    REQUIRE(round_up_to_word(256000000, AL_QWORD) == 256000000);
+    REQUIRE(align_size(113, AL_QWORD) == 128);
+    REQUIRE(align_size(256000000, AL_QWORD) == 256000000);
 
-    REQUIRE(round_up_to_word(113, AL_EWORD) == 128);
-    REQUIRE(round_up_to_word(256000000, AL_EWORD) == 256000000);
+    REQUIRE(align_size(113, AL_EWORD) == 128);
+    REQUIRE(align_size(256000000, AL_EWORD) == 256000000);
 
 }
 
@@ -74,8 +74,8 @@ void test_align_malign_pointer_logic() {
 
             const uint64_t user_size = rand() % 256 + 1;
             const posix_alignment alignment = p_aligns[i];
-            const uint64_t aligned_size = round_up_to_word(user_size, alignment);
-            const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
+            const uint64_t aligned_size = align_size(user_size, alignment);
+            const uint64_t malign_block = align_size(sizeof(void **), alignment);
             const uint64_t real_size = malign_block + alignment + aligned_size;
             const uint64_t offset = malign_block + (alignment - (p % alignment));
 
@@ -105,7 +105,7 @@ void test_align_malign_pointer_logic() {
 
 int main(int argc, char *argv[]) {
 
-    test_round_up_to_word();
+    test_align_size();
     test_align_malign_pointer_logic();
 
     size_t   alloc_user_size = argc > 1 ? atol(argv[1]) : 113;

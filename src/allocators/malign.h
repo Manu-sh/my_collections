@@ -20,8 +20,8 @@
         alignment = 8 byte
 
         24 byte block:
-            malign_block = round_up_to_word(sizeof(void **), alignment) // 8
-            malloc( malign_block + alignment + round_up_to_word(size, alignment) ) // + alignment is because the pointer could be misaligned and we need to adjust his address
+            malign_block = aligned_size(sizeof(void **), alignment) // 8
+            malloc( malign_block + alignment + aligned_size(size, alignment) ) // + alignment is because the pointer could be misaligned and we need to adjust his address
 
         real_blk = (0x07, ..., 0x1e) -> (0x07, 0x1f]
 
@@ -37,8 +37,8 @@
         alignment = 32 byte
 
         96 byte block:
-            malign_block = round_up_to_word(sizeof(void **), alignment) // 32
-            malloc( malign_block + alignment + round_up_to_word(size, alignment) ) // + alignment is because the pointer could be misaligned and we need to adjust his address
+            malign_block = aligned_size(sizeof(void **), alignment) // 32
+            malloc( malign_block + alignment + aligned_size(size, alignment) ) // + alignment is because the pointer could be misaligned and we need to adjust his address
 
         real_blk = (0x07, ..., 0x66) -> (0x07, 0x67]
 
@@ -96,7 +96,7 @@ __helper uint64_t get_real_block_size(void *user_pointer, const malign_metadata 
 // void *user_pointer = real_block + offset;
 __helper uint8_t calc_offset(void *real_block, posix_alignment alignment) {
     // alignment will be a pow of 2: a%b -> a&(b-1)
-    return round_up_to_word(sizeof(void **), alignment) + (alignment - (
+    return aligned_size(sizeof(void **), alignment) + (alignment - (
         ((uintptr_t)real_block) & (alignment - 1) // return alignment - ( ((uintptr_t)real_block) % alignment );
     ));
 }
@@ -115,8 +115,8 @@ void * malign_alloc(uint64_t size, posix_alignment alignment) {
     assert(alignment >= sizeof(malign_metadata **)); // enough space for metadata pointer
 
     // padding + reserved + aligned block: padding is required to move the user_pointer at the right address to be aligned
-    const uint64_t malign_block = round_up_to_word(sizeof(void **), alignment);
-    const uint64_t aligned_size = round_up_to_word(size, alignment);
+    const uint64_t malign_block = aligned_size(sizeof(void **), alignment);
+    const uint64_t aligned_size = aligned_size(size, alignment);
     const uint64_t real_size    = malign_block + alignment + aligned_size;
 
     uint8_t *real_block = (uint8_t *)malloc(real_size);
@@ -210,9 +210,9 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
 
     // padding + reserved + aligned block: padding is required to move the user_pointer at the right address to be aligned
     const posix_alignment alignment = (posix_alignment)metadata->user_alignment;
-    const uint64_t malign_block     = round_up_to_word(sizeof(void **), alignment);
-    const uint64_t new_aligned_size = round_up_to_word(size, alignment);
-    const uint64_t new_real_size    = malign_block + alignment + new_aligned_size;
+    const uint64_t malign_block          = aligned_size(sizeof(void **), alignment);
+    const uint64_t new_user_aligned_size = aligned_size(size, alignment);
+    const uint64_t new_real_size         = malign_block + alignment + new_user_aligned_size;
 
     #ifdef DEBUG
         printf("%s ask for blk size %lu\n", __func__, new_real_size);
@@ -241,8 +241,8 @@ void * malign_realloc(void *user_pointer, uint64_t size) {
         __builtin_assume_aligned(new_user_pointer, metadata->user_alignment),
         __builtin_assume_aligned(user_pointer, metadata->user_alignment),
         MIN( // the new block could be smaller
-            round_up_to_word(metadata->user_size, (posix_alignment)metadata->user_alignment),
-            new_aligned_size
+            aligned_size(metadata->user_size, (posix_alignment)metadata->user_alignment),
+            new_user_aligned_size
         )
     );
 

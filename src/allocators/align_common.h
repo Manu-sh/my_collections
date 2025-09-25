@@ -13,14 +13,15 @@ static FORCED(inline) uint64_t log2fast(uint64_t n_pow_of_2) {
 
 typedef enum {
     AL_INVALID  = 0,
-    AL_WORD     = sizeof(void *),     // standard alignment
-    AL_DWORD    = sizeof(void *) * 2, // 16 byte SSE
-    AL_QWORD    = sizeof(void *) * 4, // 32 byte avx2
-    AL_EWORD    = sizeof(void *) * 8, // 64 byte alignment avx512
+    AL_WORD     = sizeof(void *),     // usually  8 byte standard alignment
+    AL_DWORD    = sizeof(void *) * 2, // usually 16 byte SSE
+    AL_QWORD    = sizeof(void *) * 4, // usually 32 byte avx2
+    AL_EWORD    = sizeof(void *) * 8, // usually 64 byte alignment avx512
 } posix_alignment;
 
 
-static FORCED(inline) uint64_t round_up_to_word(uint64_t size, posix_alignment align) {
+// es. align_size(1, 64) -> 64
+static FORCED(inline) uint64_t align_size(uint64_t size, posix_alignment align) {
 
     assert(size && align);
 
