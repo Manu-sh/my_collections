@@ -34,9 +34,6 @@
         aligned_size riporta la size del blocco ma se fosse 14 memcpy non farebbe ottimizzazioni,
         per questo l'helper riporta la size richiesta dall'utente ma allineata.
 
-
-        // TODO: test con 0x01
-
         alignment = 32 byte
 
         96 byte block:
@@ -148,17 +145,15 @@ void * malign_alloc(uint64_t size, posix_alignment alignment) {
     assert( (((uint8_t *)user_pointer) + aligned_size) <= (real_block + real_size) );
 
     // gli 8 byte prima di user_pointer sono un puntatore ai metadati
-    malign_metadata *x = malign_meta_new(size, alignment, calc_offset(real_block, alignment));
-    if (UNLIKELY(!x)) {
+    set_meta(user_pointer, malign_meta_new(size, alignment, calc_offset(real_block, alignment)));
+
+    if (UNLIKELY(!get_meta(user_pointer))) {
         free(real_block);
         return NULL;
     }
 
-    set_meta(user_pointer, x);
-
     #ifdef DEBUG
         printf("%s real-block-address: %p\n", __func__, real_block);
-        printf("%s meta-address-x: %p\n", __func__, (void *)x);
         printf("%s meta-address: %p\n", __func__, (void *)get_meta(user_pointer));
         printf("%s user-block-address: %p\n", __func__, user_pointer);
         printf("%s user-block-alignment: %hu\n", __func__, get_meta(user_pointer)->user_alignment);
@@ -166,7 +161,6 @@ void * malign_alloc(uint64_t size, posix_alignment alignment) {
         printf("%s user-block-aligned-size: %lu\n", __func__, user_block_aligned_size(get_meta(user_pointer)));
         printf("%s offset: %hu\n", __func__, get_meta(user_pointer)->offset);
         puts("");
-
         assert(get_user_block_aligned_size(user_pointer) == user_block_aligned_size(get_meta(user_pointer)));
     #endif
 
