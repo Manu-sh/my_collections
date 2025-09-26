@@ -13,11 +13,10 @@ int main() {
 
     vector_bit *vct = vector_bit_new();
 
-    /*
 	if ( !vector_bit_resize(vct, 8 * 256000000u) ) {
         perror("oops");
         return EXIT_FAILURE;
-    }*/
+    }
 
     for (uint64_t i = 0; i < 8 * 256000000u; ++i) { // 256MB of bits
         vector_bit_push(vct, !(i & 1));

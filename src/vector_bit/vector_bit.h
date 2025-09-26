@@ -99,7 +99,8 @@ static FORCED(inline) uint64_t vector_bit_capacity(const vector_bit *self) {
 static bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
-    if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
+    //if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
+    if (UNLIKELY(self->bit_idx == self->bit_capacity-1)) {
         //puts("doubling");
         const uint64_t new_byte_capacity = bytes_required(self->bit_capacity * 2); // doubling the bit capacity
         uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, new_byte_capacity);
@@ -121,8 +122,8 @@ bool vector_bit_pop(vector_bit *self) {
 
     /* doubling-halving: growDown */
     //if (self->bit_capacity/4 > self->bit_idx) {
-    //if (self->bit_capacity/16 > self->bit_idx) {
-    if (UNLIKELY(self->bit_capacity/16 > self->bit_idx)) {
+    //if (UNLIKELY(self->bit_capacity/16 > self->bit_idx)) {
+    if (UNLIKELY((self->bit_capacity >> 4) > self->bit_idx)) {
         // puts("halving");
         const uint64_t byte_capacity = bytes_required(self->bit_capacity / 2); // halving the bit capacity
         uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, byte_capacity);
