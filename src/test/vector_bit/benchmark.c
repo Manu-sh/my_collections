@@ -1,11 +1,3 @@
-#if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 200112L
-    #define _POSIX_C_SOURCE 200112L
-#endif
-
-#ifndef EXTRAS
-    #define EXTRAS
-#endif
-
 #include "../../vector_bit/vector_bit.h"
 #include <stdio.h>
 
@@ -28,6 +20,7 @@ int main() {
     while (!vector_bit_is_empty(vct)) {
         //printf("step %d -> %d\n", ++times, vector_bit_pop(vct));
         vector_bit_pop(vct);
+        //vector_bit_fast_pop(vct);
     }
 
     assert(vector_bit_length(vct) == 0);

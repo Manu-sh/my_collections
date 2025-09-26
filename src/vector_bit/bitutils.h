@@ -36,7 +36,7 @@ static FORCED(inline) uint64_t bytes_required(uint64_t bits) {
    //return bits == 0 ? 1 : __builtin_expect(ceil_div8(bits), 1);
 }
 
-static inline void set_bit(uint8_t *restrict byte, uint8_t i) {
+static FORCED(inline) void set_bit(uint8_t *restrict byte, uint8_t i) {
     assert(i < 8);
     *byte |= (1 << (7-i));
 }

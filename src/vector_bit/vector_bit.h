@@ -1,5 +1,4 @@
 #pragma once
-#define EXTRAS
 
 #ifdef __cplusplus
 #include <cstdint>
@@ -179,9 +178,6 @@ static FORCED(inline) uint8_t * vector_bit_data(const vector_bit *self) {
 }
 
 
-
-#ifdef EXTRAS
-
 /* FUNCTION TO DEAL WITH UNDERLING MEMORY */
 static FORCED(inline) bool vector_bit_has_padding_bits(const vector_bit *self) {
     return self->bit_idx & 7;
@@ -240,8 +236,6 @@ static FORCED(inline) bool vector_bit_back(const vector_bit *self) {
 }
 
 
-#endif
-
 // TODO: questa funzione va testata attentamente
 static vector_bit * vector_bit_push_all(vector_bit *self, const uint8_t *src, uint64_t bit_length) {
 
@@ -251,8 +245,6 @@ static vector_bit * vector_bit_push_all(vector_bit *self, const uint8_t *src, ui
     if (bit_length == 0)
         return self;
 
-    // TODO: bug
-#if 1
     // we are lucky 'cause we can block-copy
     if (UNLIKELY(!vector_bit_has_padding_bits(self))) { // if (this->bit_length() % 8 == 0)
 
@@ -274,7 +266,7 @@ static vector_bit * vector_bit_push_all(vector_bit *self, const uint8_t *src, ui
         self->bit_idx += bit_length;
         return self;
     }
-#endif
+
     for (uint64_t i = 0; i < bit_length; ++i) {
         bool bit_value = access_bit(src, i);
         vector_bit_push(self, bit_value);
@@ -284,7 +276,6 @@ static vector_bit * vector_bit_push_all(vector_bit *self, const uint8_t *src, ui
 
 }
 
-// TODO: test me
 static FORCED(inline) bool vector_bit_equal(const vector_bit *self, const vector_bit *other) {
 
     // same length

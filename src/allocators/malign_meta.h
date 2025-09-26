@@ -5,32 +5,31 @@
 #include "align_common.h"
 
 typedef struct __attribute__((__packed__)) {
-    uint64_t user_size;      // size in bytes
-    uint8_t  user_alignment; // alignment in bytes
-    uint8_t  offset;         // distance (in bytes) between real_block and user_block, currently used only by malign.h
+    uint64_t requested_size;      // user requested size in bytes
+    uint8_t  requested_alignment; // user requested alignment in bytes
+    uint8_t  offset;              // distance (in bytes) between real_block and user_block, currently used only by malign.h
 } malign_metadata;
 
 
-// recover the effective size of block pointed by user_pointer
-// TODO: probabilmente conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
-uint64_t malign_meta_aligned_size(const malign_metadata *self) {
-    return align_size(self->user_size, (posix_alignment)self->user_alignment);
-}
-
-malign_metadata * malign_meta_new(uint64_t user_size, posix_alignment user_alignment, uint8_t offset) {
+malign_metadata * malign_meta_new(uint64_t requested_size, posix_alignment requested_alignment, uint8_t offset) {
 
     malign_metadata *self;
 
     if (UNLIKELY(!(self = (malign_metadata *)malloc(sizeof(malign_metadata)))))
         return NULL;
 
-    self->user_size      = user_size;
-    self->user_alignment = (uint8_t)user_alignment;
-    self->offset         = offset;
+    self->requested_size      = requested_size;
+    self->requested_alignment = (uint8_t)requested_alignment;
+    self->offset              = offset;
 
     return self;
 }
 
+// recover the effective size of block pointed by user_pointer
+// conviene passare questo valore a memcpy() visto che dovrebbe favorire la vettorizzazione
+uint64_t malign_meta_user_block_aligned_size(const malign_metadata *self) {
+    return align_size(self->requested_size, (posix_alignment)self->requested_alignment);
+}
 
 void malign_meta_free(malign_metadata *self) {
     free(self);

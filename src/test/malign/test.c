@@ -1,7 +1,3 @@
-#ifndef EXTRAS
-    #define EXTRAS
-#endif
-
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -72,14 +68,14 @@ void test_align_malign_pointer_logic() {
     for (uintptr_t p = 1; p < 1000; ++p) {
         for (unsigned i = 0; i < sizeof p_aligns / sizeof(*p_aligns); ++i) {
 
-            const uint64_t user_size = rand() % 256 + 1;
+            const uint64_t requested_size = rand() % 256 + 1;
             const posix_alignment alignment = p_aligns[i];
-            const uint64_t aligned_size = align_size(user_size, alignment);
+            const uint64_t aligned_size = align_size(requested_size, alignment);
             const uint64_t malign_block = align_size(sizeof(void **), alignment);
             const uint64_t real_size = malign_block + alignment + aligned_size;
             const uint64_t offset = malign_block + (alignment - (p % alignment));
 
-            printf("p=%zu real_size=%zu malign_blk=%zu aligned_size=%zu offset=%zu\n", p, real_size, malign_block, aligned_size, offset);
+            printf("p=%zu real_size=%zu malign_blk=%zu align_size=%zu offset=%zu\n", p, real_size, malign_block, aligned_size, offset);
 
             uintptr_t user_address = p + offset;
             assert(user_address % alignment == 0); // address is aligned
@@ -108,12 +104,12 @@ int main(int argc, char *argv[]) {
     test_align_size();
     test_align_malign_pointer_logic();
 
-    size_t   alloc_user_size = argc > 1 ? atol(argv[1]) : 113;
-    size_t realloc_user_size = argc > 2 ? atol(argv[2]) : 12;
+    size_t   alloc_requested_size = argc > 1 ? atol(argv[1]) : 113;
+    size_t realloc_requested_size = argc > 2 ? atol(argv[2]) : 12;
     return 0;
 
-    void *p = malign_alloc(alloc_user_size, AL_EWORD);
-    void *tmp = malign_realloc(p, realloc_user_size);
+    void *p = malign_alloc(alloc_requested_size, AL_EWORD);
+    void *tmp = malign_realloc(p, realloc_requested_size);
     if (tmp) p = tmp;
 
     malign_free(p);
