@@ -10,6 +10,7 @@
     #include <stdint.h>
     #include <stdbool.h>
     #include <assert.h>
+    #include <immintrin.h>
 #endif
 
 #include "../common_c99/common-c99.h"
@@ -58,6 +59,8 @@ static FORCED(inline) uint8_t take_few_bits(uint8_t byte, uint8_t bit_length) {
 }
 
 static FORCED(inline) void assign_bit(uint8_t *restrict v, uint64_t bit_index, bool value) {
+    __builtin_prefetch(v + 1,  1, 3);
+    __builtin_prefetch(&bit_index,  1, 3);
     const uint64_t byte_idx = bit_index >> 3; // (i/8)
     (void)(value ? set_bit(v + byte_idx, bit_index & 7) : clear_bit(v + byte_idx, bit_index & 7));  // i&7 -> i%8
 }

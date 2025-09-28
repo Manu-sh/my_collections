@@ -15,6 +15,7 @@ extern "C" {
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <immintrin.h>
 #endif
 
 #include "bitutils.h"
@@ -62,8 +63,9 @@ static void vector_bit_free(vector_bit *self) {
     free(self);
 }
 
-
+#include <immintrin.h>
 static FORCED(inline) void vector_bit_assign(vector_bit *self, uint64_t bit_index, bool value) {
+    __builtin_prefetch(self->v, 1, 3);
     assign_bit(self->v, bit_index, value);
 }
 
@@ -107,6 +109,7 @@ static bool vector_bit_push(vector_bit *self, bool value) {
 
         self->v = nv;
         self->bit_capacity = new_byte_capacity * 8;
+        //__builtin_prefetch(self->v,  1, 3);
     }
 
     vector_bit_assign(self, self->bit_idx, value), ++self->bit_idx;
