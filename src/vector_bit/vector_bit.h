@@ -276,7 +276,7 @@ static vector_bit * vector_bit_push_all(vector_bit *self, const uint8_t *src, ui
 
     for (uint64_t i = 0; i < bit_length; ++i) {
         bool bit_value = access_bit(src, i);
-        vector_bit_push(self, bit_value);
+        vector_bit_push(self, bit_value); // TODO: se fallisce ci faccio poco
     }
 
     return self;
@@ -353,15 +353,18 @@ static vector_bit * vector_bit_make_from_cstr(const char *str) {
         return NULL;
 
     const size_t bit_len = strlen(str);
-    if (!vector_bit_resize(self, bit_len)) {
-        vector_bit_free(self);
-        return NULL;
-    }
+    if (!vector_bit_resize(self, bit_len))
+        goto failure;
 
     for (size_t i = 0; i < bit_len; ++i)
-        vector_bit_push(self, !!(str[i] - '0'));
+        if (!(vector_bit_push(self, !!(str[i] - '0'))))
+            goto failure;
 
     return self;
+
+    failure:
+        vector_bit_free(self);
+        return NULL;
 }
 
 
