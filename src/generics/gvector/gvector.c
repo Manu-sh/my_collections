@@ -38,7 +38,8 @@ FORCED(inline) bool _(resize)(STRUCT *vct, int len) {
 FORCED(inline) bool _(shrinkToFit)(STRUCT *vct) {
 	TYPENAME *nv = (TYPENAME *)realloc(vct->v, (vct->idx+1) * sizeof(TYPENAME ));
 	if (!nv) return false;
-	vct->capacity = vct->idx+1;
+    vct->v = nv;
+    vct->capacity = vct->idx+1;
 	return true;
 }
 
