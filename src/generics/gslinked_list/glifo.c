@@ -30,68 +30,68 @@ FORCED(inline) int      _(maxSize)()                 { return INT_MAX;         }
 
 FORCED(inline) STRUCT * _(new)() {
 
-        STRUCT *ls;
-        if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
-                return NULL;
+    STRUCT *ls;
+    if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
+        return NULL;
 
-        /* pre-allocation */
-        if (!(ls->head = (Node *)calloc(1, sizeof(Node)))) {
-                free(ls);
-                return NULL;
-        }
+    /* pre-allocation */
+    if (!(ls->head = (Node *)calloc(1, sizeof(Node)))) {
+        free(ls);
+        return NULL;
+    }
 
 	ls->tail  = ls->head;
-        return ls;
+    return ls;
 }
 
 FORCED(inline) void _(free)(STRUCT *ls) {
 
-        Node *next;
-        if (!ls) return;
+    Node *next;
+    if (!ls) return;
 
 	while ((next = ls->head->next)) {
-                free(ls->head);
-		ls->head = next;
-        }
+        free(ls->head);
+        ls->head = next;
+    }
 
 	free(ls->head), free(ls);
 }
 
 FORCED(inline) bool _(push)(STRUCT *ls, const TYPENAME e) {
 
-        Node *blk;
+    Node *blk;
 
-        /* pre-allocation */
-        if (!(blk = (Node *)calloc(1, sizeof(Node))))
-                return false;
+    /* pre-allocation */
+    if (!(blk = (Node *)calloc(1, sizeof(Node))))
+        return false;
 
-        /* save into a previous preallocated block */
-        ls->head->data = (TYPENAME )e;
+    /* save into a previous preallocated block */
+    ls->head->data = (TYPENAME )e;
 
-        /* head must point to a preallocated block without data */
-	blk->next = ls->head;
-        ls->head  = blk;
+    /* head must point to a preallocated block without data */
+    blk->next = ls->head;
+    ls->head  = blk;
 
-        ++ls->length;
-        return true;
+    ++ls->length;
+    return true;
 }
 
 
 FORCED(inline) TYPENAME _(pop)(STRUCT *ls) {
 
-        TYPENAME ret;
-        Node *tofree;
+    TYPENAME ret;
+    Node *tofree;
 
-	/* there is always at least one block */
-	assert(!_(isEmpty)(ls));
-        ret = ls->head->next->data;
-        tofree = ls->head;
+    /* there is always at least one block */
+    assert(!_(isEmpty)(ls));
+    ret = ls->head->next->data;
+    tofree = ls->head;
 
-        ls->head     = ls->head->next;
-        free(tofree);
+    ls->head     = ls->head->next;
+    free(tofree);
 
-        --ls->length;
-        return ret;
+    --ls->length;
+    return ret;
 
 }
 
@@ -106,8 +106,8 @@ FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
 	Node *n;
 
-        if (!a || !b || !*b)
-                return NULL;
+    if (!a || !b || !*b)
+        return NULL;
 
         /* remove head (the preallocated block without data) */
 	n = a->head->next;
@@ -120,10 +120,10 @@ FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 	a->head    = (*b)->head;
 	a->tail    = (*b)->tail;
 
-        /* remember the tail isn't count as part of length */
-        a->length += (*b)->length;
+    /* remember the tail isn't count as part of length */
+    a->length += (*b)->length;
 
-        /* free the container structure STRUCT (not the nodes) */
-        free(*b); *b = NULL;
-        return a;
+    /* free the container structure STRUCT (not the nodes) */
+    free(*b); *b = NULL;
+    return a;
 }

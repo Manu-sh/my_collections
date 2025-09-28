@@ -29,74 +29,74 @@ FORCED(inline) TYPENAME  _(top)(const STRUCT *ls)     { return ls->head->data;  
 
 FORCED(inline) STRUCT * _(new)() {
 
-        STRUCT *ls;
-        if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
-                return NULL;
+    STRUCT *ls;
+    if (!(ls = (STRUCT *)calloc(1, sizeof(STRUCT))))
+        return NULL;
 
-        /* pre-allocation */
-        if (!(ls->head = (Node *)calloc(1, sizeof(Node)))) {
-                free(ls);
-                return NULL;
-        }
+    /* pre-allocation */
+    if (!(ls->head = (Node *)calloc(1, sizeof(Node)))) {
+        free(ls);
+        return NULL;
+    }
 
-        ls->tail = ls->head;
-	ls->back = ls->head;
+    ls->tail = ls->head;
+    ls->back = ls->head;
 
-        return ls;
+    return ls;
 }
 
 FORCED(inline) void _(free)(STRUCT *ls) {
 
-        Node *next;
+    Node *next;
 
-        if (!ls) return;
+    if (!ls) return;
 
 	while ((next = ls->head->next)) {
-                free(ls->head);
-		ls->head = next;
-        }
+        free(ls->head);
+        ls->head = next;
+	}
 
 	free(ls->head), free(ls);
 }
 
 FORCED(inline) bool _(push)(STRUCT *ls, const TYPENAME e) {
 
-        Node *next;
+    Node *next;
 
-        /* pre-allocation */
-        if (!(next = (Node *)calloc(1, sizeof(Node))))
-                return false;
+    /* pre-allocation */
+    if (!(next = (Node *)calloc(1, sizeof(Node))))
+            return false;
 
-        /* save into a previous preallocated block */
-        ls->tail->data = (TYPENAME)e;
-        ls->tail->next = next; /* NODE_PUSH_BACK() */
+    /* save into a previous preallocated block */
+    ls->tail->data = (TYPENAME)e;
+    ls->tail->next = next; /* NODE_PUSH_BACK() */
 
-        /* tail must point to a preallocated block without data */
-        ls->back = ls->tail;
-        ls->tail = next;
+    /* tail must point to a preallocated block without data */
+    ls->back = ls->tail;
+    ls->tail = next;
 
-        ++ls->length;
-        return true;
+    ++ls->length;
+    return true;
 }
 
 
 FORCED(inline) TYPENAME  _(pop)(STRUCT *ls) {
 
 	/* there is always at least one block */
-        TYPENAME ret = ls->head->data;
-        Node *tofree = ls->head;
+    TYPENAME ret = ls->head->data;
+    Node *tofree = ls->head;
 
-        if (!ls->head->next) { /* don't free nothing if is the last blk */
-                /* ls->head->data = NULL; */
-                ls->back       = ls->head;
-                return ret;
-        }
-
-        ls->head = ls->head->next;
-        free(tofree);
-
-        --ls->length;
+    if (!ls->head->next) { /* don't free nothing if is the last blk */
+        /* ls->head->data = NULL; */
+        ls->back       = ls->head;
         return ret;
+    }
+
+    ls->head = ls->head->next;
+    free(tofree);
+
+    --ls->length;
+    return ret;
 
 }
 
@@ -108,8 +108,8 @@ you can pass null safely to this function */
 
 FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 
-        if (!a || !b || !*b)
-                return NULL;
+    if (!a || !b || !*b)
+        return NULL;
 
         /* remove tail (the preallocated block without data) */
 	if (a->length) free(a->tail);
@@ -123,10 +123,10 @@ FORCED(inline) STRUCT * _(merge)(STRUCT *a, STRUCT **b) {
 	a->tail       = (*b)->tail;
 	a->back       = (*b)->back;
 
-        /* remember the tail isn't count as part of length */
-        a->length += (*b)->length;
+    /* remember the tail isn't count as part of length */
+    a->length += (*b)->length;
 
-        /* free the container structure Fifo (not the nodes) */
-        free(*b); *b = NULL;
-        return a;
+    /* free the container structure Fifo (not the nodes) */
+    free(*b); *b = NULL;
+    return a;
 }
