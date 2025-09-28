@@ -6,10 +6,11 @@ int main() {
 
     vector_bit *vct = vector_bit_new();
 
+    /*
 	if ( !vector_bit_resize(vct, 8 * 256000000u) ) {
         perror("oops");
         return EXIT_FAILURE;
-    }
+    }*/
 
 	// perf stat -e task-clock,cycles,instructions,r1b1,r10e,stalled-cycles-frontend,stalled-cycles-backend,L1-dcache-load-misses,cache-misses ./benchmark
     for (uint_fast64_t i = 0; i < 8 * 256000000u; ++i) { // 256MB of bits

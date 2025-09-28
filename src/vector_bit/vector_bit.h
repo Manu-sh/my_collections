@@ -5,10 +5,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <cassert>
-
 #define restrict // suppress any error since cpp doesn't have this keyword
 extern "C" {
-#include <stdbool.h> // cstdbool is deprecated in cpp17 and removed in cpp20
+    #include <stdbool.h> // cstdbool is deprecated in cpp17 and removed in cpp20
+    #include <immintrin.h>
 #else
 #include <stdint.h>
 #include <stdbool.h>
@@ -63,9 +63,8 @@ static void vector_bit_free(vector_bit *self) {
     free(self);
 }
 
-#include <immintrin.h>
+
 static FORCED(inline) void vector_bit_assign(vector_bit *self, uint64_t bit_index, bool value) {
-    __builtin_prefetch(self->v, 1, 3);
     assign_bit(self->v, bit_index, value);
 }
 
@@ -101,6 +100,8 @@ static bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
     //if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
+    //if (UNLIKELY(self->bit_capacity <= self->bit_idx)) {
+
     if (UNLIKELY(self->bit_idx == self->bit_capacity-1)) {
         //puts("doubling");
         const uint64_t new_byte_capacity = bytes_required(self->bit_capacity * 2); // doubling the bit capacity
@@ -109,11 +110,13 @@ static bool vector_bit_push(vector_bit *self, bool value) {
 
         self->v = nv;
         self->bit_capacity = new_byte_capacity * 8;
-        //__builtin_prefetch(self->v,  1, 3);
+        __builtin_prefetch(self->v,  1, 3);
     }
 
     vector_bit_assign(self, self->bit_idx, value), ++self->bit_idx;
-    //assign_bit(self->v, self->bit_idx, value). ++self->bit_idx;
+    //assign_bit(self->v, self->bit_idx, value), ++self->bit_idx;
+    __builtin_prefetch(&self->bit_idx,  1, 3);
+
     return true;
 }
 
