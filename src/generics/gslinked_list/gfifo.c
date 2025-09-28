@@ -13,7 +13,7 @@ typedef struct node {
 struct STRUCT {
 	Node *head;
 	Node *tail; /* point to a preallocated block without data */
-	Node *back;
+	Node *back; /* point to a valid block which may contain the last inserted value if !empty  */
 	int length; /* for obvious reasons the tail isn't count as part of length */
 };
 
@@ -65,7 +65,7 @@ FORCED(inline) bool _(push)(STRUCT *ls, const TYPENAME e) {
 
     /* pre-allocation */
     if (!(next = (Node *)calloc(1, sizeof(Node))))
-            return false;
+        return false;
 
     /* save into a previous preallocated block */
     ls->tail->data = (TYPENAME)e;
