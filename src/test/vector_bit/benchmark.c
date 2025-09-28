@@ -13,7 +13,8 @@ int main() {
 
 	// perf stat -e task-clock,cycles,instructions,r1b1,r10e,stalled-cycles-frontend,stalled-cycles-backend,L1-dcache-load-misses,cache-misses ./benchmark
     for (uint_fast64_t i = 0; i < 8 * 256000000u; ++i) { // 256MB of bits
-        vector_bit_push(vct, !(i & 1));
+        //vector_bit_push(vct, !(i & 1));
+        vector_bit_push(vct, 1);
         //printf("bit[%d] = %d\n", i, vector_bit_access(vct, i));
     }
 

@@ -113,6 +113,7 @@ static bool vector_bit_push(vector_bit *self, bool value) {
     }
 
     vector_bit_assign(self, self->bit_idx, value), ++self->bit_idx;
+    //assign_bit(self->v, self->bit_idx, value). ++self->bit_idx;
     return true;
 }
 
