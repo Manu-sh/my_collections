@@ -414,6 +414,132 @@ void test_concat_vector_bit() {
     }
 }
 
+
+void test_advanced_compare() {
+
+        {
+            vector_bit *bit_src = vector_bit_new();
+            vector_bit_resize(bit_src, 8);
+
+            vector_bit *bit_dst = vector_bit_new();
+            vector_bit_resize(bit_dst, 8);
+
+            vector_bit_push(bit_src, 1);
+            vector_bit_push(bit_dst, 1);
+
+            uint8_t *dst_back_byte = vector_bit_back_byte(bit_dst);
+            uint8_t *src_back_byte = vector_bit_back_byte(bit_src);
+
+            REQUIRE(access_bit(src_back_byte, 0) == 1);
+
+            // simulate a different padding at the end between bit_dst & bit_src
+            assign_bit(src_back_byte, 1, 1);
+            assign_bit(dst_back_byte, 1, 0);
+
+            REQUIRE(vector_bit_length(bit_src) == 1);
+            REQUIRE(vector_bit_length(bit_dst) == 1);
+            REQUIRE(*dst_back_byte != *src_back_byte);
+            REQUIRE(vector_bit_equal(bit_src, bit_dst));
+
+            vector_bit_free(bit_src);
+            vector_bit_free(bit_dst);
+        }
+
+        {
+
+            for (unsigned i = 0; i < 128; ++i) {
+
+                vector_bit *bit_src = vector_bit_new();
+                vector_bit *bit_dst = vector_bit_new();
+
+                vector_bit_resize(bit_src, i+1);
+                vector_bit_resize(bit_dst, i+1);
+
+                //BitArray calimero(i+1);
+
+                for (unsigned k = 1; k <= i+1; ++k) {
+
+                    vector_bit_push(bit_src, 1);
+                    vector_bit_push(bit_dst, 1);
+                    //calimero.push_back(0);
+                }
+
+
+                REQUIRE(vector_bit_back(bit_src) == vector_bit_back(bit_dst));
+
+                uint8_t *dst_back_byte = vector_bit_back_byte(bit_dst);
+                uint8_t *src_back_byte = vector_bit_back_byte(bit_src);
+
+                REQUIRE(vector_bit_last_element_byte_idx(bit_src) == vector_bit_last_element_byte_idx(bit_dst));
+                //REQUIRE(vector_bit_back_byte_without_padding(bit_src) == vector_bit_back_byte_without_padding(bit_dst));
+                REQUIRE(access_bit(src_back_byte, 0) == access_bit(dst_back_byte, 0));
+
+                // simulate a different padding at the end between bit_dst & bit_src
+                if ((i+1)%8 != 0) {
+                    assign_bit(src_back_byte, (i+1)%8, 1);
+                    assign_bit(dst_back_byte, (i+1)%8, 0);
+                }
+
+                // TODO:
+                REQUIRE(vector_bit_length(bit_src) == i+1);
+                REQUIRE(vector_bit_length(bit_dst) == i+1);
+
+                REQUIRE(vector_bit_back(bit_src) == 1);
+                REQUIRE(vector_bit_back(bit_dst) == 1);
+                REQUIRE(vector_bit_back(bit_src) == vector_bit_back(bit_dst));
+
+                // the different padding must lead different result on naive comparison
+                if ((i+1)%8 != 0) {
+                    REQUIRE(*dst_back_byte != *src_back_byte);
+                } else {
+                    REQUIRE(*dst_back_byte == *src_back_byte);
+                }
+
+                if (!vector_bit_equal(bit_src, bit_dst)) {
+
+                    //cout << i << endl;
+                    bool x = vector_bit_equal(bit_src, bit_dst);
+                    if ((i+1)%8 != 0) {
+                        REQUIRE(x == true);
+                    } else {
+                        REQUIRE(x == false);
+                    }
+                }
+
+                vector_bit_free(bit_src);
+                vector_bit_free(bit_dst);
+            }
+
+        }
+
+
+        {
+            vector_bit *a = vector_bit_make_from_cstr("001");
+            vector_bit *b = vector_bit_make_from_cstr("001");
+            uint8_t *a_back = vector_bit_back_byte(a);
+            uint8_t *b_back = vector_bit_back_byte(b);
+
+            // simulate different paddings
+            assign_bit(a_back, 3, 0);
+            assign_bit(b_back, 3, 1);
+
+            REQUIRE(*a_back != *b_back);
+            REQUIRE(vector_bit_back_byte_without_padding(a) == vector_bit_back_byte_without_padding(b));
+            REQUIRE(vector_bit_equal(a, b));
+
+            vector_bit_free(a), vector_bit_free(b);
+        }
+
+
+
+}
+
+// TODO:
+void test_vector_bit_dup() {
+
+}
+
+
 int main() {
 
     test_vector_bit_from_cstr();
@@ -421,6 +547,7 @@ int main() {
     test_empty_vector_bit();
     test_push_vector_bit();
     test_pop_vector_bit();
+    test_advanced_compare();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {
