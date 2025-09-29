@@ -306,10 +306,10 @@ static FORCED(inline) bool vector_bit_equal(const vector_bit *self, const vector
 static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
 
     vector_bit *clone;
-    if (!(clone = vector_bit_new()))
+    if (UNLIKELY(!(clone = vector_bit_new())))
         return NULL;
 
-    if (!vector_bit_resize(clone, self->bit_capacity))
+    if (UNLIKELY(!vector_bit_resize(clone, self->bit_capacity)))
         return vector_free(clone), NULL;
 
     clone->bit_idx = self->bit_idx;
