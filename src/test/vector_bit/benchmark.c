@@ -21,12 +21,12 @@ int main() {
 
 
     // int times = 0;
-    /*
+
     while (!vector_bit_is_empty(vct)) {
         //printf("step %d -> %d\n", ++times, vector_bit_pop(vct));
         vector_bit_pop(vct);
         //vector_bit_fast_pop(vct);
-    }*/
+    }
 
     //assert(vector_bit_length(vct) == 0);
     //printf("capacity %zu\n", vector_bit_capacity(vct));

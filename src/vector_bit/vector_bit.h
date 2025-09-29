@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #ifdef __cplusplus
 #include <cstdint>
 #include <cstdlib>
@@ -99,11 +101,8 @@ static FORCED(inline) uint64_t vector_bit_capacity(const vector_bit *self) {
 static bool vector_bit_push(vector_bit *self, bool value) {
 
     /* doubling-halving: growUp */
-    //if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
-    //if (UNLIKELY(self->bit_capacity <= self->bit_idx)) {
+    if (UNLIKELY(self->bit_idx == self->bit_capacity-1)) { // if (UNLIKELY(self->bit_idx >= self->bit_capacity-1)) {
 
-    if (UNLIKELY(self->bit_idx == self->bit_capacity-1)) {
-        //puts("doubling");
         const uint64_t new_byte_capacity = bytes_required(self->bit_capacity * 2); // doubling the bit capacity
         uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, new_byte_capacity);
         if (UNLIKELY(!nv)) return false;
@@ -114,7 +113,6 @@ static bool vector_bit_push(vector_bit *self, bool value) {
     }
 
     vector_bit_assign(self, self->bit_idx, value), ++self->bit_idx;
-    //assign_bit(self->v, self->bit_idx, value), ++self->bit_idx;
     __builtin_prefetch(&self->bit_idx,  1, 3);
 
     return true;
@@ -127,10 +125,8 @@ bool vector_bit_pop(vector_bit *self) {
     const bool ret = vector_bit_access(self, --self->bit_idx);
 
     /* doubling-halving: growDown */
-    //if (self->bit_capacity/4 > self->bit_idx) {
-    //if (UNLIKELY(self->bit_capacity/16 > self->bit_idx)) {
-    if (UNLIKELY((self->bit_capacity >> 4) > self->bit_idx)) {
-        // puts("halving");
+    if (UNLIKELY((self->bit_capacity >> 5) > self->bit_idx)) { // if (UNLIKELY(self->bit_capacity / (4 * 8) > self->bit_idx)) {
+
         const uint64_t byte_capacity = bytes_required(self->bit_capacity / 2); // halving the bit capacity
         uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, byte_capacity);
         if (UNLIKELY(!nv)) return ret; /* do nothing */
@@ -308,7 +304,7 @@ static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
         return NULL;
 
     if (UNLIKELY(!vector_bit_resize(clone, self->bit_capacity)))
-        return vector_free(clone), NULL;
+        return vector_bit_free(clone), (vector_bit *)NULL; // this cast if because of compiler bug
 
     clone->bit_idx = self->bit_idx;
     memcpy((void *)clone->v, (void *)self->v, vector_bit_effective_byte_size(self));
