@@ -534,8 +534,26 @@ void test_advanced_compare() {
 
 }
 
-// TODO:
 void test_vector_bit_dup() {
+    {
+        vector_bit *src = vector_bit_make_from_cstr("001");
+        vector_bit *cpy = vector_bit_dup(src);
+
+        REQUIRE(vector_bit_equal(src, cpy));
+        vector_bit_free(src), vector_bit_free(cpy);
+    }
+
+    {
+        vector_bit *src = vector_bit_new();
+        for (unsigned i = 0; i < 200007; ++i) {
+            REQUIRE(vector_bit_push(src, !(i & 1)));
+            REQUIRE(vector_bit_back(src) == !(i & 1));
+        }
+
+        vector_bit *cpy = vector_bit_dup(src);
+        REQUIRE(vector_bit_equal(src, cpy));
+        vector_bit_free(src), vector_bit_free(cpy);
+    }
 
 }
 
@@ -548,6 +566,7 @@ int main() {
     test_push_vector_bit();
     test_pop_vector_bit();
     test_advanced_compare();
+    test_vector_bit_dup();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {
