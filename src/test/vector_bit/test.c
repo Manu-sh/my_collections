@@ -557,6 +557,65 @@ void test_vector_bit_dup() {
 
 }
 
+void test_push_all() {
+
+
+
+    {
+
+
+        vector_bit *a = vector_bit_new();
+        vector_bit_resize(a, 24); // 24 bit
+        uint8_t *vct8 = vector_bit_data(a);
+
+        // set 24 bit to 1
+        for (unsigned i = 0; i < vector_bit_byte_capacity(a); ++i) {
+            uint8_t *el = vector_bit_data(a) + i;
+            for (unsigned b = 0; b < 8; ++b)
+                assign_bit(el, b, 1);
+        }
+
+
+        { // read all 24 bits
+            vector_bit *dst = vector_bit_make_from_mem(vct8, 24);
+
+            REQUIRE(vector_bit_effective_byte_size(dst) == 3);
+            REQUIRE(vector_bit_capacity(dst) == 24);
+            REQUIRE(vector_bit_length(dst) == 24);
+            REQUIRE(vector_bit_last_bit_idx(dst) == 23);
+
+            for (unsigned i = 0; i < vector_bit_length(dst); ++i)
+                REQUIRE(vector_bit_access(dst, i) == 1);
+
+            vector_bit_free(dst);
+        }
+
+
+        { // read only 3 bits
+            vector_bit *dst = vector_bit_make_from_mem(vct8, 3);
+
+            REQUIRE(vector_bit_effective_byte_size(dst) == 1);
+            REQUIRE(vector_bit_capacity(dst) == 8);
+            REQUIRE(vector_bit_length(dst) == 3);
+            REQUIRE(vector_bit_last_bit_idx(dst) == 2);
+
+            for (unsigned i = 0; i < vector_bit_length(dst); ++i)
+                REQUIRE(vector_bit_access(dst, i) == 1);
+
+            vector_bit_free(dst);
+        }
+
+        vector_bit_free(a);
+
+    }
+
+
+
+}
+
+
+// TEST_CASE("testing explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length)") {
+
 
 int main() {
 
@@ -567,6 +626,7 @@ int main() {
     test_pop_vector_bit();
     test_advanced_compare();
     test_vector_bit_dup();
+    test_push_all();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {

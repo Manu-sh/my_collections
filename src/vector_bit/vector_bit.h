@@ -368,6 +368,22 @@ static vector_bit * vector_bit_make_from_cstr(const char *str) {
 }
 
 
+static vector_bit * vector_bit_make_from_mem(const uint8_t *src, uint64_t bit_length) {
+
+    vector_bit *self;
+
+    if (UNLIKELY(!(self = vector_bit_new())))
+        return NULL;
+
+    if (UNLIKELY(!vector_bit_resize(self, bit_length))) {
+        vector_bit_free(self);
+        return NULL;
+    }
+
+    return LIKELY((uintptr_t)vector_bit_push_all(self, src, bit_length)) ? self : (vector_bit_free(self), (vector_bit *)NULL);
+}
+
+
 #ifdef __cplusplus
 }
 #endif
