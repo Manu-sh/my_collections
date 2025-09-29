@@ -151,8 +151,6 @@ static FORCED(inline) void vector_bit_fast_pop(vector_bit *self) {
 static bool vector_bit_resize(vector_bit *self, uint64_t bit_len) {
 
     const uint64_t byte_capacity = bytes_required(bit_len);
-    //printf("%s capacity byte: %zu\n", __func__, byte_capacity);
-
     uint8_t *const nv = (uint8_t *)BLK_REALLOC(self->v, byte_capacity);
     if (UNLIKELY(!nv)) return false;
 
