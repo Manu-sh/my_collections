@@ -616,6 +616,34 @@ void test_push_all() {
 
 // TEST_CASE("testing explicit BitArray(BitArray8 *vct, uint64_t byte_length, uint64_t bit_length)") {
 
+// https://en.wikipedia.org/wiki/QR_code#Error_correction_bytes
+void test_qr_code() {
+
+    // ['Enc' 'Len' w w w . w i k i p e d i a . o r g 'End']
+    vector_bit *msg = vector_bit_make_from_cstr("0100"); // encoding mode: byte
+
+    {
+        const char *str = "www.wikipedia.org";
+        const uint8_t len = strlen(str);
+        vector_bit_push_all(msg, &len, sizeof(uint8_t) * 8);
+        vector_bit_push_all(msg, (uint8_t *)str, len * 8);
+    }
+
+    vector_bit_push(msg, 0);  // 0000
+    vector_bit_push(msg, 0);
+    vector_bit_push(msg, 0);
+    vector_bit_push(msg, 0);
+
+    for (unsigned i = 0; i < vector_bit_effective_byte_size(msg); ++i)
+        printf("%x\n", vector_bit_data(msg)[i]);
+
+    // [41 17 77 77 72 E7 76 96 B6 97 06 56 46 96 12 E6 F7 26 70]
+    const uint8_t expected[] = { 0x41, 0x17, 0x77, 0x77, 0x72, 0xE7, 0x76, 0x96, 0xB6, 0x97, 0x06, 0x56, 0x46, 0x96, 0x12, 0xE6, 0xF7, 0x26, 0x70 };
+    REQUIRE(vector_bit_effective_byte_size(msg) == 19);
+    REQUIRE(memcmp(vector_bit_data(msg), expected, vector_bit_effective_byte_size(msg)) == 0);
+    vector_bit_free(msg);
+}
+
 
 int main() {
 
@@ -627,6 +655,7 @@ int main() {
     test_advanced_compare();
     test_vector_bit_dup();
     test_push_all();
+    test_qr_code();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {
