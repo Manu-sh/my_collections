@@ -644,6 +644,33 @@ void test_qr_code() {
     vector_bit_free(msg);
 }
 
+void test_mov() {
+
+	{
+		vector_bit *dst = vector_bit_new();
+		vector_bit *src = vector_bit_make_from_cstr("01110");
+
+		REQUIRE(vector_bit_length(src) == 5);
+		REQUIRE(vector_bit_length(dst) == 0);
+
+		vector_bit_mov(dst, src);
+
+		REQUIRE(vector_bit_length(src) == 0);
+		REQUIRE(vector_bit_length(dst) == 5);
+
+		REQUIRE(vector_bit_access(dst, 0) == 0);
+		REQUIRE(vector_bit_access(dst, 1) == 1);
+		REQUIRE(vector_bit_access(dst, 2) == 1);
+		REQUIRE(vector_bit_access(dst, 3) == 1);
+		REQUIRE(vector_bit_access(dst, 4) == 0);
+
+		vector_bit_free(dst);
+		vector_bit_free(src);
+	}
+
+}
+
+// TODO: implement vector_bit_swap()
 
 int main() {
 
@@ -656,6 +683,7 @@ int main() {
     test_vector_bit_dup();
     test_push_all();
     test_qr_code();
+    test_mov();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {
