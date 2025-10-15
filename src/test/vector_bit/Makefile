@@ -1,5 +1,5 @@
-CFLAGS=-std=c99 -O0 -pipe -Wall -Wextra -Wno-unused-function -pedantic -ftrapv -fstack-protector-all -fstack-protector-strong -fno-builtin-memcpy -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable -g3 -fno-omit-frame-pointer
-CXXFLAGS=-std=c++11 -O3 -ffast-math -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic -Werror
+CFLAGS=-std=c99 -O0 -pipe -Wall -Wextra -Wno-unused-function -pedantic -ftrapv -fstack-protector-all -fstack-protector-strong -fno-builtin-memcpy -fsanitize=address,undefined,null,alignment,leak,pointer-compare,pointer-subtract,unreachable -g3 -fno-omit-frame-pointer #-fno-strict-aliasing
+CXXFLAGS=-std=c++11 -O3 -ffast-math -pipe -ffast-math -Wall -Wextra -D_REENTRANT -Wno-unused-function -fstack-protector-all -fstack-protector-strong -funroll-loops -pedantic -Werror #-fno-strict-aliasing
 .PHONY: all clean
 
 all:
