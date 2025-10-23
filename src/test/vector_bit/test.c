@@ -8,7 +8,7 @@
     #define REQUIRE(_EXP_) (assert(_EXP_));
 #endif
 
-static void test_empty_vector_bit() {
+static void test_empty() {
 
     vector_bit *vct = vector_bit_new();
 
@@ -46,7 +46,7 @@ static void test_empty_vector_bit() {
 }
 
 
-static void test_push_vector_bit() {
+static void test_push() {
 
     vector_bit *vct = vector_bit_new();
 
@@ -101,7 +101,7 @@ static void test_push_vector_bit() {
 }
 
 
-static void test_pop_vector_bit() {
+static void test_pop() {
 
     vector_bit *vct = vector_bit_new();
 
@@ -280,7 +280,7 @@ static void test_pop_vector_bit() {
     vector_bit_free(vct);
 }
 
-void test_vector_bit_from_cstr() {
+void test_make_from_cstr() {
 
     const char *bits = "010010101000101010100001";
     vector_bit *vb = vector_bit_make_from_cstr(bits);
@@ -292,7 +292,7 @@ void test_vector_bit_from_cstr() {
 
 }
 
-void test_concat_vector_bit() {
+void test_concat() {
 
     vector_bit *a = vector_bit_new();
     vector_bit *b = vector_bit_new();
@@ -534,7 +534,7 @@ void test_advanced_compare() {
 
 }
 
-void test_vector_bit_dup() {
+void test_dup() {
     {
         vector_bit *src = vector_bit_make_from_cstr("001");
         vector_bit *cpy = vector_bit_dup(src);
@@ -670,20 +670,62 @@ void test_mov() {
 
 }
 
-// TODO: implement vector_bit_swap()
+void test_swap() {
+
+    {
+        vector_bit *a = vector_bit_new();
+        vector_bit *b = vector_bit_make_from_cstr("01110");
+
+        uint64_t idx_a = a->bit_idx,      idx_b = b->bit_idx;
+        uint64_t cap_a = a->bit_capacity, cap_b = b->bit_capacity;
+        void *addr_a = a->v, *addr_b = b->v;
+
+        vector_bit_swap(a, b);
+
+        // SWAP
+        REQUIRE(a->bit_capacity == cap_b);
+        REQUIRE(b->bit_capacity == cap_a);
+
+        REQUIRE(a->v == addr_b);
+        REQUIRE(b->v == addr_a);
+
+        REQUIRE(a->bit_idx == idx_b);
+        REQUIRE(b->bit_idx == idx_a);
+
+
+        vector_bit_swap(a, b);
+
+        // RE-SWAP BACK
+        REQUIRE(a->bit_capacity == cap_a);
+        REQUIRE(b->bit_capacity == cap_b);
+
+        REQUIRE(a->v == addr_a);
+        REQUIRE(b->v == addr_b);
+
+        REQUIRE(a->bit_idx == idx_a);
+        REQUIRE(b->bit_idx == idx_b);
+
+        vector_bit_free(a);
+        vector_bit_free(b);
+    }
+
+}
+
+
 
 int main() {
 
-    test_vector_bit_from_cstr();
-    test_concat_vector_bit();
-    test_empty_vector_bit();
-    test_push_vector_bit();
-    test_pop_vector_bit();
+    test_make_from_cstr();
+    test_concat();
+    test_empty();
+    test_push();
+    test_pop();
     test_advanced_compare();
-    test_vector_bit_dup();
+    test_dup();
     test_push_all();
     test_qr_code();
     test_mov();
+    test_swap();
 
     vector_bit *vct = vector_bit_new();
     for (int i = 0; i < 145; ++i) {

@@ -312,6 +312,13 @@ static FORCED(inline) vector_bit * vector_bit_dup(const vector_bit *self) {
 }
 
 
+static FORCED(inline) void vector_bit_swap(vector_bit *a, vector_bit *b) {
+    const vector_bit tmp = *a;
+    *a = *b;
+    *b = tmp;
+}
+
+
 // just like a cpp move: move src into dst.
 static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
@@ -319,11 +326,12 @@ static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
     if (dst->v == src->v) {
         dst->bit_idx = src->bit_idx; // however this should never happen
-        goto src_reset;
+        goto src_reset; // src is now moved into dst
     }
 
     BLK_FREE(dst->v); // free the current dst buffer
 
+    // vector_bit_swap(src, dst);
     dst->v            = src->v;
     dst->bit_idx      = src->bit_idx;
     dst->bit_capacity = src->bit_capacity;
@@ -331,10 +339,12 @@ static FORCED(inline) void vector_bit_mov(vector_bit *dst, vector_bit *src) {
 
     src_reset:
 
-    // leave the moved vector in a properly stat
+    // leave the moved vector in a properly stat creating an empty vector_bit
     src->bit_capacity = VECTOR_BIT_DEFAULT_BIT_CAPACITY;
     src->v = (uint8_t *)BLK_MALLOC( bytes_required(src->bit_capacity) );
     src->bit_idx = 0;
+
+    //vector_bit_swap(src, vector_bit_new());
     assert(src->v);
 }
 
