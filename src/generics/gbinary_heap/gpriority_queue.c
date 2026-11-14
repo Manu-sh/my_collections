@@ -21,7 +21,7 @@ struct STRUCT {
 };
 
 
-__helper void fixUp(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int k) {
+__helper void _(fixUp)(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int k) {
 
 	while (k > 1 && lt(v[k>>1], v[k])) {
 		SWAP(TYPENAME, v[k>>1], v[k]);
@@ -29,7 +29,7 @@ __helper void fixUp(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int k) {
 	}
 }
 
-__helper void fixDown(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to) {
+__helper void _(fixDown)(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to) {
 
 #if 0
 	for (int j; (j = p << 1) <= to; p = j) {
@@ -65,7 +65,7 @@ __helper void fixDown(TYPENAME *v, bool (*lt)(TYPENAME,TYPENAME), int p, int to)
 
 
 /* INT_MAX-1 because heap start at 1 */
-FORCED(inline)	int _(maxSize)() {
+FORCED(inline) int _(maxSize)() {
 	return INT_MAX-1;
 }
 
@@ -127,7 +127,7 @@ FORCED(inline) bool _(add)(STRUCT *hp, const TYPENAME e) {
 	}
 
 	hp->v[++hp->idx] = (TYPENAME )e;
-	fixUp(hp->v, hp->lt, hp->idx);
+	_(fixUp)(hp->v, hp->lt, hp->idx);
 
 	return true;
 
@@ -139,7 +139,7 @@ FORCED(inline) TYPENAME _(remove)(STRUCT *hp) {
 	TYPENAME ret;
 
 	SWAP(TYPENAME, hp->v[1], hp->v[hp->idx]);
-	fixDown(hp->v, hp->lt, 1, hp->idx-1);
+	_(fixDown)(hp->v, hp->lt, 1, hp->idx-1);
 	ret = hp->v[hp->idx--];
 
 	/* doubling-halving: growDown */
@@ -167,6 +167,6 @@ FORCED(inline) TYPENAME _(replace)(STRUCT *hp, const TYPENAME e) {
 	assert(!_(isEmpty)(hp));
 
 	SWAP(TYPENAME, ret, hp->v[1]);
-	fixDown(hp->v, hp->lt, 1, hp->idx-1);
+	_(fixDown)(hp->v, hp->lt, 1, hp->idx-1);
 	return ret;
 }
